@@ -16,8 +16,9 @@ funcionários). O diferencial competitivo são seis agentes de IA integrados ao 
 seções navegáveis pela barra lateral (`overview`, `personas`, `metrics`, `features`, `stories`,
 `ux`, `nfr`, `arch`, `models`, `api`, `flows`, `roles`, `roadmap`).
 
-Os outros dois arquivos em `docs/` (`gestorcontratos-prd-specs.html` e `-v2`) são **versões
-anteriores, superadas**. Estão preservados por histórico; não use como fonte de verdade.
+Duas versões anteriores (`gestorcontratos-prd-specs.html` e `-v2`) foram removidas por estarem
+superadas. Continuam recuperáveis no histórico do git, no commit `deb5f35`, caso alguma decisão
+antiga precise ser reconstituída.
 
 Divergência entre PRD e código: consulte `DECISIONS.md` primeiro. Decisão já registrada → siga o
 código. Sem registro → é drift de verdade; avise antes de prosseguir, não resolva em silêncio.
