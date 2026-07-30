@@ -78,6 +78,11 @@ Frontend (a partir de `frontend/`):
 - Rodar:  `npm run dev`
 - Build:  `npm run build`
 
+**Rode os dois juntos.** O frontend chama `/api/...` na própria origem e o `next.config.ts`
+encaminha para o FastAPI em `127.0.0.1:8000` — mesmo arranjo do nginx em produção, por isso
+não há CORS. Acesse por **`http://acme.localhost:3000`**, não por `localhost:3000`: sem o
+subdomínio não há tenant a resolver.
+
 ## Convenções
 
 - **Idioma:** código, identificadores e nomes de tabela em inglês; comentários, mensagens de
@@ -122,6 +127,12 @@ Frontend (a partir de `frontend/`):
   schema e `SET LOCAL` só existem no PostgreSQL. Eles dependem dos tenants `acme` e `contoso`
   provisionados. Se a suíte falhar com "relation does not exist", reprovisione com
   `provision_tenant`.
+- **Next.js 16 tem mudanças que quebram o que você provavelmente sabe.** `params`,
+  `searchParams`, `cookies` e `headers` são exclusivamente assíncronos (o acesso síncrono foi
+  removido, não apenas depreciado); a convenção `middleware` virou `proxy`; Turbopack é o padrão
+  em dev e build. A documentação da versão exata instalada está em
+  `frontend/node_modules/next/dist/docs/` — **consulte antes de escrever código de App Router**,
+  em vez de confiar na memória.
 - **`.test` não serve como domínio de e-mail.** O `email-validator`, usado pelo `EmailStr` do
   Pydantic, recusa TLDs de uso especial — e com razão, não existe e-mail entregável em `.test`.
   Os usuários de desenvolvimento usam `{tenant}.com.br`.

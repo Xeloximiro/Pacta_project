@@ -11,14 +11,21 @@ Sessão 1: fundação do repositório, multi-tenancy (schema-per-tenant) e o pri
 
 ### 🔵 Em andamento
 
-- [ ] **Etapa E — Solicitação de Contrato** — próximo item a começar
+_Sessão 1 concluída. Nada em andamento._
 
-### ⚪ A fazer (sessão 1)
+### ⚪ A fazer (próxima sessão)
 
-**Etapa E — Primeiro fluxo: Categorias e Solicitação**
-- [x] ~~`contract_categories` + CRUD + 3 pacotes de setor semeados~~ — feito na Etapa C
-- [ ] `contract_requests` + `request_attachments` + endpoints
-- [ ] Frontend: layout, login, Nova Solicitação, Minhas Solicitações
+Seguindo a ordem de prioridade da Fase 1 do roadmap:
+
+- [ ] **`request_attachments` + upload** — depende de configurar o Supabase Storage. Sem
+  anexo, o caminho "minuta de terceiro" da Solicitação fica pela metade.
+- [ ] **`contract_messages`** — chat interno de Solicitação e Contrato, com herança na
+  conversão. É P0 no roadmap e não depende de mais nada que já não exista.
+- [ ] **Tela de Análise da Solicitação** — onde o Jurídico tria, converte ou recusa. O
+  backend já tem `/triage` e `/reject`; falta a interface.
+- [ ] **`contract_templates`** — destrava `suggested_template_id` na Solicitação e o
+  Agente Redator mais adiante.
+- [ ] **`contracts`** — destrava a conversão de Solicitação em contrato, fechando o fluxo.
 
 ### ✅ Concluído (recente)
 
@@ -46,6 +53,13 @@ Sessão 1: fundação do repositório, multi-tenancy (schema-per-tenant) e o pri
   - `require_roles(...)` aplicando a matriz de permissões do PRD
   - `scripts/seed_dev.py` — 2 tenants e 10 usuários (um por papel em cada)
   - **25 testes passando**, com controle negativo na checagem cross-tenant do token
+- [x] **Etapa E** — Solicitação de Contrato, backend e frontend — 2026-07-30
+  - `contract_requests` com abertura aberta a todos os papéis e triagem restrita
+  - `POST /triage` e `POST /reject`; listagem com escopo por papel
+  - `scripts/migrate_tenants.py` — aplica a linhagem de tenant em todos os schemas
+  - Frontend Next.js 16 + Tailwind v4 com a paleta do PRD: login, Minhas Solicitações,
+    Nova Solicitação
+  - **39 testes passando** + fluxo validado no navegador ponta a ponta
 
 ### 🔴 Bloqueado
 
@@ -63,15 +77,24 @@ próximas sessões.
 
 ## Log de sessões
 
-### 2026-07-29 — Sessão 1: fundação do projeto
+### 2026-07-29/30 — Sessão 1: fundação, multi-tenancy e primeiro fluxo
 
-- **Feito:** orientação completa (PRD canônico lido integralmente); levantamento do ambiente;
-  três decisões estruturais registradas (greenfield, Supabase cloud, Python 3.12); Etapa A
-  concluída — repositório inicializado, PRDs organizados em `docs/`, control files criados e
-  primeiro push para o GitHub.
-- **Pendente:** Etapas B a E, conforme o quadro acima.
-- **Próximo:** começar pela Etapa B (venv + `requirements.txt` + `/health`). Não depende do banco,
-  então roda mesmo sem a connection string.
-- **Gotcha descoberto:** `py -3` nesta máquina aponta para o Python 3.14, que está **sem pip**.
-  Sempre `py -3.12`. Também não há Docker, PostgreSQL local nem `gh` CLI — o push usa o Git
-  Credential Manager, que abre o navegador para autenticar.
+- **Feito:** Etapas A a E completas. Repositório publicado, backend FastAPI com
+  schema-per-tenant funcionando, autenticação por tenant com RBAC, Solicitação de Contrato
+  de ponta a ponta e frontend Next.js com as três telas do fluxo. 39 testes passando.
+- **Pendente:** anexos da Solicitação (depende do Supabase Storage) e a tela de Análise,
+  que o backend já suporta.
+- **Próximo:** `contract_messages` (chat interno) é o P0 mais desimpedido — não depende de
+  storage nem de tabela que falte. Alternativa igualmente boa: a tela de Análise, que
+  aproveita `/triage` e `/reject` já prontos.
+- **Gotchas descobertos** (todos já em `CLAUDE.md`):
+  - `py -3` aponta para o Python 3.14, **sem pip**. Sempre `py -3.12`.
+  - `SET search_path` executado na conexão dentro do `env.py` do Alembic faz a migration
+    ser revertida em silêncio, depois de logar sucesso. Use `server_settings`.
+  - Filtrar `include_object` por `obj.schema is None` na linhagem de tenant fez o
+    autogenerate propor `drop_table` de todo o catálogo da plataforma assim que surgiu a
+    primeira FK entre schemas. O filtro agora é lista explícita de nomes.
+  - Importar modelo pelo módulo direto em vez do agregador quebra `relationship` por
+    string — e a falha só aparece na primeira query.
+  - Next.js 16 removeu o acesso síncrono a `params`/`cookies`/`headers` e renomeou
+    `middleware` para `proxy`. A doc da versão instalada está em `node_modules/next/dist/docs/`.

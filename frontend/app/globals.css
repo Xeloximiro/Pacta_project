@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+/* Tokens da identidade visual do Pacta, definidos na seção `ux` do PRD.
+   Fonte única — nenhum hex solto em componente. */
+@theme {
+  --color-primaria: #4f46e5;
+  --color-primaria-escura: #4338ca;
+  --color-primaria-clara: #eef2ff;
+
+  --color-tinta: #0f172a;
+  --color-ardosia: #64748b;
+  --color-nevoa: #e2e8f0;
+  --color-sucesso: #10b981;
+  --color-alerta: #f59e0b;
+  --color-erro: #ef4444;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: #f8fafc;
+  color: var(--color-tinta);
+}
