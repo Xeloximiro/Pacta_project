@@ -56,24 +56,31 @@ def get_target_schema() -> str:
     return schema
 
 
-def include_object(obj, name, type_, reflected, compare_to) -> bool:
-    """Mantém esta linhagem restrita aos modelos de tenant.
+# Os nomes que esta linhagem administra, tirados dos próprios modelos de tenant.
+TENANT_TABLES = frozenset(
+    table.name for table in target_metadata.tables.values() if table.schema is None
+)
 
-    Modelo de tenant é o que **não** declara schema — quem resolve o destino dele é o
-    `search_path`. Sem este filtro, cada schema de tenant ganharia uma cópia própria de
-    `tenants`, `plans` e `platform_users`, e o catálogo da plataforma deixaria de ter uma
-    fonte única.
+
+def include_object(obj, name, type_, reflected, compare_to) -> bool:
+    """Mantém esta linhagem restrita às tabelas que ela própria administra.
+
+    O filtro é uma **lista explícita**, e não uma checagem de `obj.schema is None`, por um
+    motivo que custou caro: o `search_path` inclui `public`, e assim que uma tabela de
+    tenant ganhou FK para `public.platform_users`, a reflexão passou a trazer as tabelas
+    da plataforma de volta com schema nulo. A checagem por schema as classificou como
+    "tabela removida" e o autogenerate escreveu `drop_table` para `platform_users`,
+    `tenants`, `plans` e todo o resto do catálogo.
+
+    Comparar com a lista de nomes conhecidos não pode ser enganado por resolução de nome.
+    O preço é que remover um modelo de tenant não gera mais o `drop_table` automático —
+    aceitável: escrever um drop à mão é trabalho de minutos, e restaurar o catálogo da
+    plataforma apagado por engano, não.
     """
     if type_ == "table":
-        # O `search_path` inclui `public`, então a reflexão enxerga também as tabelas de
-        # versão do Alembic que moram lá. Sem esta guarda o autogenerate as classifica
-        # como "tabela removida" e escreve um `drop_table` da tabela de versão da
-        # plataforma — perda do histórico de migration da linhagem inteira.
-        if name.startswith("alembic_version"):
-            return False
-        return obj.schema is None
+        return name in TENANT_TABLES
     if type_ == "column":
-        return obj.table.schema is None
+        return obj.table.name in TENANT_TABLES
     return True
 
 
