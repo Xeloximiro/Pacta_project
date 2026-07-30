@@ -11,7 +11,7 @@ Sessão 1: fundação do repositório, multi-tenancy (schema-per-tenant) e o pri
 
 ### 🔵 Em andamento
 
-_Sessão 1 concluída. Nada em andamento._
+_Nada em andamento._
 
 ### ⚪ A fazer (próxima sessão)
 
@@ -19,13 +19,13 @@ Seguindo a ordem de prioridade da Fase 1 do roadmap:
 
 - [ ] **`request_attachments` + upload** — depende de configurar o Supabase Storage. Sem
   anexo, o caminho "minuta de terceiro" da Solicitação fica pela metade.
-- [ ] **`contract_messages`** — chat interno de Solicitação e Contrato, com herança na
-  conversão. É P0 no roadmap e não depende de mais nada que já não exista.
-- [ ] **Tela de Análise da Solicitação** — onde o Jurídico tria, converte ou recusa. O
-  backend já tem `/triage` e `/reject`; falta a interface.
 - [ ] **`contract_templates`** — destrava `suggested_template_id` na Solicitação e o
   Agente Redator mais adiante.
 - [ ] **`contracts`** — destrava a conversão de Solicitação em contrato, fechando o fluxo.
+  É também o que completa `contract_messages`: a migration torna `request_id` anulável,
+  acrescenta `contract_id` e a `CHECK` de exatamente-um que o PRD especifica.
+- [ ] **Menções no digest** — `mentioned_user_ids` já é gravado, mas nada consome. Entra
+  junto com `notification_items` e o motor de notificação.
 
 ### ✅ Concluído (recente)
 
@@ -60,6 +60,15 @@ Seguindo a ordem de prioridade da Fase 1 do roadmap:
   - Frontend Next.js 16 + Tailwind v4 com a paleta do PRD: login, Minhas Solicitações,
     Nova Solicitação
   - **39 testes passando** + fluxo validado no navegador ponta a ponta
+- [x] **Chat interno da Solicitação** — 2026-07-30
+  - `contract_messages` em tabela separada de `negotiation_comments`, sem `updated_at`
+    nem `deleted_at`: a imutabilidade é estrutural, não uma verificação
+  - Eventos de ciclo de vida (triagem, devolução) na mesma linha do tempo das mensagens
+  - Menções resolvidas só para membros ativos do tenant
+  - Regra de visibilidade extraída para `requests/service.py`, usada pelas duas rotas
+  - Tela de detalhe da Solicitação com a conversa e as ações de análise
+  - **49 testes passando**, com controle negativo na visibilidade
+  - Corrigido `InvalidCachedStatementError` — ver `DECISIONS.md`
 
 ### 🔴 Bloqueado
 
@@ -82,11 +91,12 @@ próximas sessões.
 - **Feito:** Etapas A a E completas. Repositório publicado, backend FastAPI com
   schema-per-tenant funcionando, autenticação por tenant com RBAC, Solicitação de Contrato
   de ponta a ponta e frontend Next.js com as três telas do fluxo. 39 testes passando.
-- **Pendente:** anexos da Solicitação (depende do Supabase Storage) e a tela de Análise,
-  que o backend já suporta.
-- **Próximo:** `contract_messages` (chat interno) é o P0 mais desimpedido — não depende de
-  storage nem de tabela que falte. Alternativa igualmente boa: a tela de Análise, que
-  aproveita `/triage` e `/reject` já prontos.
+- **Também feito:** chat interno da Solicitação, backend e tela, com eventos de ciclo de
+  vida na linha do tempo. 49 testes.
+- **Pendente:** anexos da Solicitação, que dependem do Supabase Storage.
+- **Próximo:** `contracts` é o item de maior alcance — fecha a conversão de Solicitação em
+  contrato e completa `contract_messages` com `contract_id` e a `CHECK` de exatamente-um.
+  Alternativa menor e independente: `request_attachments`, se o Storage for configurado.
 - **Gotchas descobertos** (todos já em `CLAUDE.md`):
   - `py -3` aponta para o Python 3.14, **sem pip**. Sempre `py -3.12`.
   - `SET search_path` executado na conexão dentro do `env.py` do Alembic faz a migration

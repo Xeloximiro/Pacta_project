@@ -81,28 +81,33 @@ export default function ListaSolicitacoes() {
       ) : (
         <ul className="divide-y divide-nevoa overflow-hidden rounded-xl border border-nevoa bg-white">
           {solicitacoes.map((s) => (
-            <li key={s.id} className="flex items-start gap-4 px-5 py-4">
-              <span className="mt-0.5 font-mono text-xs text-ardosia">
-                #{s.request_number}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-tinta">{s.title}</p>
-                <p className="mt-0.5 text-xs text-ardosia">
-                  Aberta em {formatarData(s.created_at)}
-                  {s.counterparty_raw && ` · ${s.counterparty_raw}`}
-                </p>
-                {s.rejection_reason && (
-                  <p className="mt-2 rounded-md bg-red-50 px-2.5 py-1.5 text-xs text-red-700">
-                    {s.rejection_reason}
-                  </p>
-                )}
-              </div>
-              {/* O status fica visível na lista, sem exigir clique — princípio de UX do PRD. */}
-              <span
-                className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${CLASSE_STATUS[s.status]}`}
+            <li key={s.id}>
+              <Link
+                href={`/solicitacoes/${s.id}`}
+                className="flex items-start gap-4 px-5 py-4 transition hover:bg-slate-50"
               >
-                {ROTULO_STATUS[s.status]}
-              </span>
+                <span className="mt-0.5 font-mono text-xs text-ardosia">
+                  #{s.request_number}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium text-tinta">{s.title}</p>
+                  <p className="mt-0.5 text-xs text-ardosia">
+                    Aberta em {formatarData(s.created_at)}
+                    {s.counterparty_raw && ` · ${s.counterparty_raw}`}
+                  </p>
+                  {s.rejection_reason && (
+                    <p className="mt-2 rounded-md bg-red-50 px-2.5 py-1.5 text-xs text-red-700">
+                      {s.rejection_reason}
+                    </p>
+                  )}
+                </div>
+                {/* O status fica visível na lista, sem exigir clique — princípio de UX do PRD. */}
+                <span
+                  className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${CLASSE_STATUS[s.status]}`}
+                >
+                  {ROTULO_STATUS[s.status]}
+                </span>
+              </Link>
             </li>
           ))}
         </ul>

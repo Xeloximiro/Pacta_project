@@ -148,6 +148,16 @@ export interface Solicitacao {
   created_at: string;
 }
 
+export interface Mensagem {
+  id: string;
+  kind: "humano" | "sistema";
+  body: string;
+  author_id: string | null;
+  author_name: string | null;
+  mentioned_user_ids: string[];
+  created_at: string;
+}
+
 // ───────────────────────────────────────────────────────── Chamadas
 
 export async function login(email: string, password: string) {
@@ -173,4 +183,25 @@ export const criarSolicitacao = (dados: Record<string, unknown>) =>
   apiFetch<Solicitacao>("/v1/contract-requests", {
     method: "POST",
     body: JSON.stringify(dados),
+  });
+
+export const buscarSolicitacao = (id: string) =>
+  apiFetch<Solicitacao>(`/v1/contract-requests/${id}`);
+
+export const listarMensagens = (id: string) =>
+  apiFetch<Mensagem[]>(`/v1/contract-requests/${id}/messages`);
+
+export const enviarMensagem = (id: string, body: string) =>
+  apiFetch<Mensagem>(`/v1/contract-requests/${id}/messages`, {
+    method: "POST",
+    body: JSON.stringify({ body }),
+  });
+
+export const assumirTriagem = (id: string) =>
+  apiFetch<Solicitacao>(`/v1/contract-requests/${id}/triage`, { method: "POST" });
+
+export const recusarSolicitacao = (id: string, reason: string) =>
+  apiFetch<Solicitacao>(`/v1/contract-requests/${id}/reject`, {
+    method: "POST",
+    body: JSON.stringify({ reason }),
   });
