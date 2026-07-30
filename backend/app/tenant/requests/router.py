@@ -10,21 +10,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_current_user, get_tenant_session, require_roles
 from app.platform.identity.schemas import CurrentUser
 from app.platform.models import TenantRole
+from app.tenant.messages.service import registrar_evento
 from app.tenant.models import ContractRequest, RequestStatus
 from app.tenant.requests.schemas import (
     ContractRequestCreate,
     ContractRequestRead,
     ContractRequestReject,
 )
+from app.tenant.requests.service import (
+    PAPEIS_COM_VISAO_TOTAL,
+    buscar_solicitacao_visivel,
+)
 
 router = APIRouter(prefix="/api/v1/contract-requests", tags=["solicitações"])
-
-# Quem enxerga a fila inteira. Os demais papéis veem apenas as próprias Solicitações —
-# não por sigilo, mas porque a lista de outra pessoa não ajuda o solicitante em nada e a
-# fila completa é ferramenta de trabalho de quem tria.
-PAPEIS_COM_VISAO_TOTAL = frozenset(
-    {TenantRole.JURIDICO, TenantRole.GESTOR_CONTRATOS, TenantRole.ADMIN}
-)
 
 # Quem tria: analisa, converte em contrato ou recusa pedindo mais informação.
 triagem = require_roles(
@@ -88,27 +86,6 @@ async def list_requests(
     return list((await session.execute(consulta)).scalars().all())
 
 
-async def _buscar_visivel(
-    session: AsyncSession, request_id: UUID, user: CurrentUser
-) -> ContractRequest:
-    """Carrega a Solicitação conferindo se este usuário pode vê-la."""
-    solicitacao = await session.get(ContractRequest, request_id)
-    if solicitacao is None or solicitacao.deleted_at is not None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Solicitação não encontrada."
-        )
-    if (
-        user.role not in PAPEIS_COM_VISAO_TOTAL
-        and solicitacao.requester_id != user.id
-    ):
-        # 404 em vez de 403: confirmar que a Solicitação existe já entregaria que alguém
-        # na empresa pediu algo, e o número sequencial permitiria varrer a fila inteira.
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Solicitação não encontrada."
-        )
-    return solicitacao
-
-
 @router.get("/{request_id}", response_model=ContractRequestRead)
 async def get_request(
     request_id: UUID,
@@ -116,7 +93,7 @@ async def get_request(
     user: CurrentUser = Depends(get_current_user),
 ) -> ContractRequest:
     """Detalhe de uma Solicitação."""
-    return await _buscar_visivel(session, request_id, user)
+    return await buscar_solicitacao_visivel(session, request_id, user)
 
 
 @router.post("/{request_id}/triage", response_model=ContractRequestRead)
@@ -130,7 +107,7 @@ async def start_triage(
     Marca `triaged_at`, que é a base da métrica de SLA "tempo entre abertura e triagem" —
     a que o PRD usa para detectar se o Jurídico virou gargalo na entrada.
     """
-    solicitacao = await _buscar_visivel(session, request_id, user)
+    solicitacao = await buscar_solicitacao_visivel(session, request_id, user)
     if solicitacao.status != RequestStatus.ABERTA:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -140,6 +117,11 @@ async def start_triage(
     solicitacao.status = RequestStatus.EM_TRIAGEM
     solicitacao.triaged_by = user.id
     solicitacao.triaged_at = datetime.now(timezone.utc)
+    await registrar_evento(
+        session,
+        request_id=solicitacao.id,
+        texto=f"{user.full_name} assumiu a análise desta solicitação.",
+    )
     await session.flush()
     return solicitacao
 
@@ -155,7 +137,7 @@ async def reject_request(
 
     A Solicitação recusada fica no histórico de pedidos, nunca no acervo contratual.
     """
-    solicitacao = await _buscar_visivel(session, request_id, user)
+    solicitacao = await buscar_solicitacao_visivel(session, request_id, user)
     if solicitacao.status in (RequestStatus.CONVERTIDA, RequestStatus.CANCELADA):
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -167,5 +149,13 @@ async def reject_request(
     solicitacao.triaged_by = user.id
     if solicitacao.triaged_at is None:
         solicitacao.triaged_at = datetime.now(timezone.utc)
+    await registrar_evento(
+        session,
+        request_id=solicitacao.id,
+        texto=(
+            f"{user.full_name} devolveu a solicitação pedindo mais informação: "
+            f"{payload.reason.strip()}"
+        ),
+    )
     await session.flush()
     return solicitacao

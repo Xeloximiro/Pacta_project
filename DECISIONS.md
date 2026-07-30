@@ -5,6 +5,42 @@ para mudar uma decisão, escreva uma nova que substitui a anterior.
 
 ---
 
+## 2026-07-30 — Cache de prepared statements desligado no asyncpg
+
+**Contexto:** ao acrescentar `contract_messages`, a suíte passou a falhar de forma
+intermitente com `InvalidCachedStatementError`. A causa não é o chat: é a interação entre
+o pool de conexões, a troca de `search_path` por requisição e o cache de planos do asyncpg.
+
+O asyncpg guarda planos de statement por conexão, indexados pelo **texto SQL**. As tabelas
+de tenant não são qualificadas por schema — é o `search_path` que resolve o destino. Logo,
+`SELECT ... FROM contract_requests` é o mesmo texto para tabelas físicas diferentes. Uma
+conexão devolvida ao pool e reaproveitada por outro tenant carrega o plano ligado ao schema
+anterior.
+
+**Decisão:** `prepared_statement_cache_size=0` e `statement_cache_size=0` nos `connect_args`
+do engine.
+
+**Motivo:** é a única correção compatível com o modelo de isolamento. As alternativas foram
+descartadas:
+
+- *Qualificar as queries com o schema* faria o texto SQL diferir por tenant e o cache
+  voltaria a funcionar — mas significaria montar nome de schema dentro das queries, que é
+  exatamente o que o `CLAUDE.md` proíbe, e desmontaria a garantia de que o handler não
+  escolhe o tenant.
+- *Um pool por tenant* resolveria sem custo de cache, mas multiplica conexões por número de
+  clientes; com centenas de tenants, o Postgres é o gargalo.
+
+**Consequências:**
+- Custo aproximado de 10% na invocação de statement, permanente. É o preço do isolamento
+  físico com pool compartilhado, e vale registrar ao avaliar o alvo de performance do PRD
+  (lista de 100 contratos em menos de 1,5s).
+- **Não houve risco de vazamento.** O Postgres invalida o plano e levanta erro em vez de ler
+  a tabela errada. O sintoma era indisponibilidade intermitente, não dado trocado.
+- Se um dia a performance apertar, o caminho é medir antes de mexer: o gargalo provável é a
+  consulta de tenant e a de vínculo feitas a cada requisição, não o cache de statements.
+
+---
+
 ## 2026-07-29 — Sem Docker
 
 **Contexto:** definido que o deploy é numa VPS Debian 11 própria, ficou a questão de como os

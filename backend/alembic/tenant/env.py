@@ -61,6 +61,11 @@ TENANT_TABLES = frozenset(
     table.name for table in target_metadata.tables.values() if table.schema is None
 )
 
+# Tabelas do catálogo da plataforma. Usado para reconhecer as FKs que cruzam schemas.
+PLATFORM_TABLES = frozenset(
+    table.name for table in target_metadata.tables.values() if table.schema == "public"
+)
+
 
 def include_object(obj, name, type_, reflected, compare_to) -> bool:
     """Mantém esta linhagem restrita às tabelas que ela própria administra.
@@ -81,6 +86,18 @@ def include_object(obj, name, type_, reflected, compare_to) -> bool:
         return name in TENANT_TABLES
     if type_ == "column":
         return obj.table.name in TENANT_TABLES
+    if type_ == "foreign_key_constraint":
+        # FK de tabela de tenant para o catálogo da plataforma (`requester_id` →
+        # `public.platform_users`, por exemplo). A reflexão entre schemas devolve o alvo
+        # sem o qualificador, então a comparação com o modelo — que diz `public.` — nunca
+        # bate, e todo autogenerate propõe derrubar e recriar constraints idênticas. Pior:
+        # o downgrade gerado sai com `None` no lugar do nome e falharia ao rodar.
+        #
+        # Essas FKs são estruturais e não mudam sozinhas; alterá-las é migration escrita à
+        # mão. Ignorá-las aqui remove o ruído de toda migration futura.
+        alvo = getattr(obj, "referred_table", None)
+        if alvo is not None and alvo.name in PLATFORM_TABLES:
+            return False
     return True
 
 

@@ -19,6 +19,21 @@ engine = create_async_engine(
     # O Supabase encerra conexões ociosas. Sem o pre-ping, a primeira query depois de um
     # período parado falha com "connection was closed" em vez de reconectar.
     pool_pre_ping=True,
+    connect_args={
+        # **Obrigatório neste modelo de isolamento.** O asyncpg guarda planos de statement
+        # por conexão, indexados pelo texto SQL. Como as tabelas de tenant não são
+        # qualificadas por schema, `SELECT ... FROM contract_requests` resolve para uma
+        # tabela física diferente conforme o `search_path` — e uma conexão devolvida ao
+        # pool e reutilizada por outro tenant traz o plano ligado ao schema anterior.
+        #
+        # O Postgres detecta e levanta `InvalidCachedStatementError` em vez de devolver
+        # dado do tenant errado, então não é um vazamento; é uma falha intermitente que
+        # aparece quando o pool recicla conexão entre tenants. Desligar o cache custa algo
+        # em torno de 10% na invocação de statement, que é o preço do isolamento físico.
+        "prepared_statement_cache_size": 0,
+        # O asyncpg mantém um cache próprio, além do que o SQLAlchemy administra.
+        "statement_cache_size": 0,
+    },
 )
 
 async_session_factory = async_sessionmaker(engine, expire_on_commit=False)

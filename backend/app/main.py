@@ -6,6 +6,7 @@ from app.core.config import get_settings
 from app.middleware.tenant_resolver import TenantResolverMiddleware
 from app.platform.identity.router import router as auth_router
 from app.tenant.categories.router import router as categories_router
+from app.tenant.messages.router import router as messages_router
 from app.tenant.requests.router import router as requests_router
 
 settings = get_settings()
@@ -25,6 +26,7 @@ app.add_middleware(TenantResolverMiddleware)
 app.include_router(auth_router)
 app.include_router(categories_router)
 app.include_router(requests_router)
+app.include_router(messages_router)
 
 
 @app.get("/health", tags=["infra"])

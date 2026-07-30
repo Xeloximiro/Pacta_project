@@ -120,6 +120,16 @@ subdomínio não há tenant a resolver.
   fechamento da conexão, **depois de logar "Running upgrade" com sucesso**. O sintoma é um schema
   criado e vazio. O caminho certo é o que está lá: `connect_args={"server_settings":
   {"search_path": ...}}`, aplicado pelo asyncpg no handshake, fora de qualquer transação.
+- **Não reative o cache de prepared statements do asyncpg.** Os `connect_args` do engine
+  trazem `prepared_statement_cache_size=0` e `statement_cache_size=0` por necessidade, não por
+  descuido: o cache é indexado pelo texto SQL, e como as tabelas de tenant não são qualificadas
+  por schema, o mesmo texto vale para tabelas físicas diferentes. Conexão reciclada entre tenants
+  quebra com `InvalidCachedStatementError`. Ver `DECISIONS.md`.
+- **FK de tabela de tenant para o `public` gera falso positivo no autogenerate.** A reflexão
+  entre schemas devolve o alvo sem qualificador, a comparação nunca bate e toda migration
+  proporia derrubar e recriar constraints idênticas — com `None` no lugar do nome, no
+  downgrade. O `include_object` do `env.py` de tenant já filtra essas FKs; alterá-las exige
+  migration escrita à mão.
 - **Importe modelos pelos agregadores** (`app.platform.models`, `app.tenant.models`), nunca pelo
   módulo direto. `Tenant` tem `relationship` por string para `TenantMembership`; importando o
   módulo isolado, a falha não aparece no import e sim na primeira query, longe da causa.
