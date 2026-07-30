@@ -63,10 +63,16 @@ docs/                PRD canônico + versões anteriores
 
 ## Como rodar / testar / buildar
 
-Backend (a partir de `backend/`):
+Backend (a partir de `backend/`, com o venv ativo):
 - Rodar:  `uvicorn app.main:app --reload`
 - Testar: `pytest`
+- **Preparar o ambiente:** `python -m scripts.seed_dev` — provisiona os tenants `acme` e
+  `contoso` e cria um usuário por papel em cada. Idempotente. **Os testes dependem disso.**
 - Migrar plataforma: `alembic -c alembic/platform/alembic.ini upgrade head`
+- Migrar um tenant: `alembic -c alembic/tenant/alembic.ini -x schema=tenant_acme upgrade head`
+
+Usuários de desenvolvimento: `{papel}@{tenant}.com.br`, senha `pacta123456`. Ex.:
+`juridico@acme.com.br`, `visualizador@contoso.com.br`.
 
 Frontend (a partir de `frontend/`):
 - Rodar:  `npm run dev`
@@ -116,6 +122,9 @@ Frontend (a partir de `frontend/`):
   schema e `SET LOCAL` só existem no PostgreSQL. Eles dependem dos tenants `acme` e `contoso`
   provisionados. Se a suíte falhar com "relation does not exist", reprovisione com
   `provision_tenant`.
+- **`.test` não serve como domínio de e-mail.** O `email-validator`, usado pelo `EmailStr` do
+  Pydantic, recusa TLDs de uso especial — e com razão, não existe e-mail entregável em `.test`.
+  Os usuários de desenvolvimento usam `{tenant}.com.br`.
 - **Ao acrescentar teste de isolamento, valide com controle negativo:** quebre o `search_path` de
   propósito e confirme que o teste falha. Teste de isolamento que passa por acidente é pior que
   nenhum, porque cria confiança infundada em cima da garantia central do produto.

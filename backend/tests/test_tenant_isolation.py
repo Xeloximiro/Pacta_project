@@ -14,7 +14,7 @@ from sqlalchemy import text
 from app.core.db import async_session_factory
 from app.main import app
 from app.middleware.tenant_resolver import extract_slug
-from tests.conftest import TENANT_A, TENANT_B
+from tests.conftest import SENHA_DEV, TENANT_A, TENANT_B
 
 CATEGORIES_URL = "/api/v1/contract-categories"
 
@@ -54,10 +54,10 @@ def test_extract_slug(host: str, base: str, esperado: str | None) -> None:
 # ─────────────────────────────────────────────── Isolamento efetivo (integração)
 
 
-async def test_cada_tenant_ve_apenas_as_proprias_categorias(client: AsyncClient) -> None:
+async def test_cada_tenant_ve_apenas_as_proprias_categorias(client, auth_headers) -> None:
     """Os dois tenants foram semeados com pacotes de setor diferentes."""
-    resp_a = await client.get(CATEGORIES_URL, headers={"X-Tenant-Slug": TENANT_A})
-    resp_b = await client.get(CATEGORIES_URL, headers={"X-Tenant-Slug": TENANT_B})
+    resp_a = await client.get(CATEGORIES_URL, headers=await auth_headers(TENANT_A))
+    resp_b = await client.get(CATEGORIES_URL, headers=await auth_headers(TENANT_B))
 
     assert resp_a.status_code == 200
     assert resp_b.status_code == 200
@@ -69,28 +69,28 @@ async def test_cada_tenant_ve_apenas_as_proprias_categorias(client: AsyncClient)
     assert "compra_venda" in codigos_b and "compra_venda" not in codigos_a
 
 
-async def test_dado_criado_num_tenant_nao_aparece_no_outro(client: AsyncClient) -> None:
+async def test_dado_criado_num_tenant_nao_aparece_no_outro(client, auth_headers) -> None:
     """O teste central: escrita em um schema não é legível pelo outro."""
     code = f"iso{uuid4().hex[:10]}"
     try:
         criacao = await client.post(
             CATEGORIES_URL,
-            headers={"X-Tenant-Slug": TENANT_A},
+            headers=await auth_headers(TENANT_A, "juridico"),
             json={"name": "Categoria de Isolamento", "code": code},
         )
         assert criacao.status_code == 201
 
-        no_tenant_a = await client.get(CATEGORIES_URL, headers={"X-Tenant-Slug": TENANT_A})
+        no_tenant_a = await client.get(CATEGORIES_URL, headers=await auth_headers(TENANT_A))
         assert code in {c["code"] for c in no_tenant_a.json()}
 
-        no_tenant_b = await client.get(CATEGORIES_URL, headers={"X-Tenant-Slug": TENANT_B})
+        no_tenant_b = await client.get(CATEGORIES_URL, headers=await auth_headers(TENANT_B))
         assert code not in {c["code"] for c in no_tenant_b.json()}
     finally:
         await _remover_categoria(f"tenant_{TENANT_A}", code)
 
 
 async def test_conexao_reaproveitada_nao_carrega_o_tenant_anterior(
-    client: AsyncClient,
+    client, auth_headers
 ) -> None:
     """Requisições alternadas na mesma aplicação não contaminam umas às outras.
 
@@ -98,9 +98,12 @@ async def test_conexao_reaproveitada_nao_carrega_o_tenant_anterior(
     manteria o `search_path` do tenant anterior e a requisição seguinte leria os dados do
     cliente errado. Alternar várias vezes força o reúso de conexão do pool.
     """
+    headers_a = await auth_headers(TENANT_A)
+    headers_b = await auth_headers(TENANT_B)
+
     for _ in range(4):
-        resp_a = await client.get(CATEGORIES_URL, headers={"X-Tenant-Slug": TENANT_A})
-        resp_b = await client.get(CATEGORIES_URL, headers={"X-Tenant-Slug": TENANT_B})
+        resp_a = await client.get(CATEGORIES_URL, headers=headers_a)
+        resp_b = await client.get(CATEGORIES_URL, headers=headers_b)
 
         assert "parceria" in {c["code"] for c in resp_a.json()}
         assert "parceria" not in {c["code"] for c in resp_b.json()}
@@ -111,7 +114,16 @@ async def test_resolucao_por_subdominio_equivale_ao_cabecalho() -> None:
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://acme.localhost"
     ) as subdominio:
-        resp = await subdominio.get(CATEGORIES_URL)
+        login = await subdominio.post(
+            "/api/v1/auth/login",
+            json={"email": f"admin@{TENANT_A}.com.br", "password": SENHA_DEV},
+        )
+        assert login.status_code == 200
+
+        resp = await subdominio.get(
+            CATEGORIES_URL,
+            headers={"Authorization": f"Bearer {login.json()['access_token']}"},
+        )
 
     assert resp.status_code == 200
     assert "parceria" in {c["code"] for c in resp.json()}
@@ -120,18 +132,18 @@ async def test_resolucao_por_subdominio_equivale_ao_cabecalho() -> None:
 # ─────────────────────────────────────────────── Recusas
 
 
-async def test_tenant_inexistente_retorna_404(client: AsyncClient) -> None:
+async def test_tenant_inexistente_retorna_404(client) -> None:
     resp = await client.get(CATEGORIES_URL, headers={"X-Tenant-Slug": "naoexiste"})
     assert resp.status_code == 404
 
 
-async def test_requisicao_sem_tenant_retorna_400(client: AsyncClient) -> None:
+async def test_requisicao_sem_tenant_retorna_400(client) -> None:
     """Sem subdomínio nem cabeçalho, a rota de tenant não roda em schema nenhum."""
     resp = await client.get(CATEGORIES_URL)
     assert resp.status_code == 400
 
 
-async def test_rota_de_plataforma_dispensa_tenant(client: AsyncClient) -> None:
+async def test_rota_de_plataforma_dispensa_tenant(client) -> None:
     """`/health` não pertence a nenhum tenant e não pode exigir um."""
     resp = await client.get("/health")
     assert resp.status_code == 200

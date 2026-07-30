@@ -18,6 +18,7 @@ alembic==1.18.5
 # ─────────────────────────────── Configuração e validação
 pydantic==2.13.4
 pydantic-settings==2.14.2
+email-validator==2.3.0         # exigido pelo EmailStr do Pydantic
 
 # ─────────────────────────────── Segurança
 pyjwt==2.13.0

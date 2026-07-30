@@ -11,16 +11,12 @@ Sessão 1: fundação do repositório, multi-tenancy (schema-per-tenant) e o pri
 
 ### 🔵 Em andamento
 
-- [ ] **Etapa D — Auth e RBAC** — próximo item a começar
+- [ ] **Etapa E — Solicitação de Contrato** — próximo item a começar
 
 ### ⚪ A fazer (sessão 1)
 
-**Etapa D — Auth e RBAC**
-- [ ] Login e-mail/senha (argon2 + JWT) + dependency `current_user`
-- [ ] RBAC dos 5 papéis conforme a matriz da seção `roles` do PRD
-
 **Etapa E — Primeiro fluxo: Categorias e Solicitação**
-- [ ] `contract_categories` + CRUD + 3 pacotes de setor semeados
+- [x] ~~`contract_categories` + CRUD + 3 pacotes de setor semeados~~ — feito na Etapa C
 - [ ] `contract_requests` + `request_attachments` + endpoints
 - [ ] Frontend: layout, login, Nova Solicitação, Minhas Solicitações
 
@@ -43,6 +39,13 @@ Sessão 1: fundação do repositório, multi-tenancy (schema-per-tenant) e o pri
   - `contract_categories` + rotas `GET`/`POST /api/v1/contract-categories`
   - **15 testes passando**, incluindo controle negativo: quebrando o isolamento de
     propósito, exatamente os 3 testes de isolamento falham
+- [x] **Etapa D** — autenticação e RBAC — 2026-07-29
+  - Argon2id para senha, JWT com `tid` que amarra o token a um único tenant
+  - `get_current_user` reconfere o vínculo no banco a cada requisição, para que revogar
+    acesso tenha efeito imediato em vez de esperar o token expirar
+  - `require_roles(...)` aplicando a matriz de permissões do PRD
+  - `scripts/seed_dev.py` — 2 tenants e 10 usuários (um por papel em cada)
+  - **25 testes passando**, com controle negativo na checagem cross-tenant do token
 
 ### 🔴 Bloqueado
 

@@ -35,6 +35,15 @@ async def _descartar_pool() -> AsyncGenerator[None, None]:
     await engine.dispose()
 
 
+# Credenciais criadas por `scripts.seed_dev`. Precisam bater com o script.
+SENHA_DEV = "pacta123456"
+DOMINIO_DEV = "com.br"
+
+
+def email_de(tenant: str, papel: str) -> str:
+    return f"{papel}@{tenant}.{DOMINIO_DEV}"
+
+
 @pytest.fixture
 async def client() -> AsyncGenerator[AsyncClient, None]:
     """Cliente HTTP falando com a aplicação em memória, sem subir servidor."""
@@ -42,3 +51,30 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
         transport=ASGITransport(app=app), base_url="http://testserver"
     ) as http_client:
         yield http_client
+
+
+@pytest.fixture
+async def auth_headers(client: AsyncClient):
+    """Fábrica de cabeçalhos autenticados: `await auth_headers(tenant, papel)`.
+
+    Faz login de verdade pela rota pública em vez de forjar o token. Assim os testes
+    exercitam o caminho completo — hash de senha, verificação de vínculo, emissão — e
+    quebram se qualquer etapa dele regredir.
+    """
+
+    async def _make(tenant: str, role: str = "admin") -> dict[str, str]:
+        resposta = await client.post(
+            "/api/v1/auth/login",
+            headers={"X-Tenant-Slug": tenant},
+            json={"email": email_de(tenant, role), "password": SENHA_DEV},
+        )
+        assert resposta.status_code == 200, (
+            f"Login falhou para {email_de(tenant, role)} ({resposta.status_code}). "
+            "Rode `python -m scripts.seed_dev`."
+        )
+        return {
+            "X-Tenant-Slug": tenant,
+            "Authorization": f"Bearer {resposta.json()['access_token']}",
+        }
+
+    return _make
