@@ -103,3 +103,19 @@ Frontend (a partir de `frontend/`):
   para a contraparte. Conversa com a contraparte vive em `negotiation_comments`.
 - **Migrations são duas linhagens.** Alterar tabela de tenant exige rodar a migration em *todos*
   os schemas de tenant ativos, não só no `public`.
+- **Nunca faça `connection.execute("SET search_path ...")` no `env.py` do Alembic.** Esse execute
+  faz o SQLAlchemy abrir uma transação por conta própria, e o `context.begin_transaction()` do
+  Alembic deixa de ser dono dela — ninguém dá commit e a migration inteira é revertida no
+  fechamento da conexão, **depois de logar "Running upgrade" com sucesso**. O sintoma é um schema
+  criado e vazio. O caminho certo é o que está lá: `connect_args={"server_settings":
+  {"search_path": ...}}`, aplicado pelo asyncpg no handshake, fora de qualquer transação.
+- **Importe modelos pelos agregadores** (`app.platform.models`, `app.tenant.models`), nunca pelo
+  módulo direto. `Tenant` tem `relationship` por string para `TenantMembership`; importando o
+  módulo isolado, a falha não aparece no import e sim na primeira query, longe da causa.
+- **Os testes rodam contra o banco de desenvolvimento real**, não contra SQLite — isolamento por
+  schema e `SET LOCAL` só existem no PostgreSQL. Eles dependem dos tenants `acme` e `contoso`
+  provisionados. Se a suíte falhar com "relation does not exist", reprovisione com
+  `provision_tenant`.
+- **Ao acrescentar teste de isolamento, valide com controle negativo:** quebre o `search_path` de
+  propósito e confirme que o teste falha. Teste de isolamento que passa por acidente é pior que
+  nenhum, porque cria confiança infundada em cima da garantia central do produto.

@@ -11,15 +11,9 @@ Sessão 1: fundação do repositório, multi-tenancy (schema-per-tenant) e o pri
 
 ### 🔵 Em andamento
 
-- [ ] **Etapa C — Multi-tenancy** — código pode ser escrito; verificação depende da connection string
+- [ ] **Etapa D — Auth e RBAC** — próximo item a começar
 
 ### ⚪ A fazer (sessão 1)
-
-**Etapa C — Multi-tenancy (P0, trava todo o resto)**
-- [ ] Alembic em duas linhagens: `alembic/platform` e `alembic/tenant`
-- [ ] `middleware/tenant_resolver.py` — subdomínio → `search_path`
-- [ ] Serviço `tenant_provisioning` idempotente (schema + migration + seed do pacote de setor)
-- [ ] Teste de isolamento cross-tenant (pytest)
 
 **Etapa D — Auth e RBAC**
 - [ ] Login e-mail/senha (argon2 + JWT) + dependency `current_user`
@@ -40,12 +34,23 @@ Sessão 1: fundação do repositório, multi-tenancy (schema-per-tenant) e o pri
   - `app/core/db.py` — engine async, sessão, `Base`, mixins e o helper `pg_enum`
   - `/health` respondendo 200 e `/api/docs` renderizando
   - 6 modelos do schema `public` com DDL PostgreSQL validado
+- [x] **Etapa C** — multi-tenancy funcionando de ponta a ponta — 2026-07-29
+  - Alembic em duas linhagens, cada uma com tabela de versão própria
+  - `tenant_provisioning` idempotente: schema + migration + seed do pacote de setor
+  - 3 pacotes de setor com categorias de partida (genérico, jurídico, compras)
+  - `tenant_resolver` — subdomínio ou `X-Tenant-Slug` → schema, com recusa por status
+  - `get_tenant_session` — `SET LOCAL search_path` por requisição
+  - `contract_categories` + rotas `GET`/`POST /api/v1/contract-categories`
+  - **15 testes passando**, incluindo controle negativo: quebrando o isolamento de
+    propósito, exatamente os 3 testes de isolamento falham
 
 ### 🔴 Bloqueado
 
-- [ ] Verificação de qualquer coisa que toque o banco (Etapas C, D, E) — **bloqueada até existir a
-  connection string do Supabase em `backend/.env`**. O código pode ser escrito antes; a
-  verificação, não.
+_Nada bloqueado no momento._
+
+**Pendência de segurança:** a senha do banco de desenvolvimento trafegou pelo chat durante a
+sessão 1. Antes de qualquer coisa ir para produção, rotacionar em
+Supabase → Project Settings → Database → Reset database password.
 
 ## Fora do escopo da sessão 1
 

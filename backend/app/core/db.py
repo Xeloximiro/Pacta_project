@@ -34,21 +34,27 @@ class Base(DeclarativeBase):
     """Base declarativa comum a modelos de plataforma e de tenant."""
 
 
-def pg_enum(enum_cls: type[enum.Enum], name: str) -> SAEnum:
+def pg_enum(
+    enum_cls: type[enum.Enum], name: str, schema: str | None = "public"
+) -> SAEnum:
     """Cria um ENUM do Postgres que grava os *valores* do enum Python.
 
     Sem `values_callable`, o SQLAlchemy grava o **nome** do membro (`GENERICO`), e o PRD
     especifica os valores em minúsculo (`generico`). O erro só apareceria em runtime, na
     primeira leitura de um dado gravado por outro caminho.
 
-    Os tipos vivem sempre no schema `public`, mesmo quando usados por tabelas de tenant:
-    uma definição única compartilhada por todos os schemas, em vez de N cópias idênticas
-    que precisariam ser alteradas uma a uma a cada valor novo.
+    Sobre o `schema`:
+
+    - Modelos de **plataforma** usam o padrão `"public"`, junto das tabelas que os usam.
+    - Modelos de **tenant** devem passar `schema=None`. Sem schema fixo, o tipo é criado
+      onde o `search_path` apontar — ou seja, dentro do próprio `tenant_{slug}`. Isso
+      mantém cada schema de tenant autocontido: `DROP SCHEMA ... CASCADE` leva junto os
+      tipos que só ele usava, sem deixar órfão no `public`.
     """
     return SAEnum(
         enum_cls,
         name=name,
-        schema="public",
+        schema=schema,
         values_callable=lambda e: [member.value for member in e],
     )
 
@@ -57,6 +63,19 @@ class UUIDPrimaryKey:
     """Chave primária UUID gerada na aplicação."""
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+
+
+class SoftDeleteMixin:
+    """Exclusão lógica, obrigatória em todo modelo de tenant.
+
+    Nada é apagado de verdade: um contrato removido por engano continua sendo prova em
+    auditoria e em litígio, e o PRD trata a integridade do histórico como requisito, não
+    como conveniência. Consultas de leitura precisam filtrar `deleted_at IS NULL`.
+    """
+
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), index=True
+    )
 
 
 class TimestampMixin:

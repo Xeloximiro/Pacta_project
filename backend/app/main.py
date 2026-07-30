@@ -3,6 +3,8 @@
 from fastapi import FastAPI
 
 from app.core.config import get_settings
+from app.middleware.tenant_resolver import TenantResolverMiddleware
+from app.tenant.categories.router import router as categories_router
 
 settings = get_settings()
 
@@ -13,6 +15,12 @@ app = FastAPI(
     docs_url=None if settings.is_production else "/api/docs",
     redoc_url=None,
 )
+
+# Registrado antes de qualquer rota de tenant: é ele que resolve o subdomínio e deixa o
+# schema em `request.state` para a dependency de sessão consumir.
+app.add_middleware(TenantResolverMiddleware)
+
+app.include_router(categories_router)
 
 
 @app.get("/health", tags=["infra"])
