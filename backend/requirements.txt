@@ -1,0 +1,31 @@
+# Pacta CLM — backend
+# Python 3.12 (ver DECISIONS.md). Versões fixadas a partir da resolução verificada em 2026-07-29.
+#
+# Instalação:
+#   Windows: py -3.12 -m venv .venv && .venv\Scripts\python -m pip install -r requirements.txt
+#   Debian:  python3.12 -m venv .venv && .venv/bin/python -m pip install -r requirements.txt
+
+# ─────────────────────────────── Web
+fastapi==0.141.1
+uvicorn[standard]==0.52.0
+python-multipart==0.0.32       # upload de anexos de Solicitação
+
+# ─────────────────────────────── Banco
+sqlalchemy[asyncio]==2.0.51
+asyncpg==0.31.0
+alembic==1.18.5
+
+# ─────────────────────────────── Configuração e validação
+pydantic==2.13.4
+pydantic-settings==2.14.2
+
+# ─────────────────────────────── Segurança
+pyjwt==2.13.0
+argon2-cffi==25.1.0
+
+# ─────────────────────────────── Clientes HTTP (ClickSign, OpenAI, testes)
+httpx==0.28.1
+
+# ─────────────────────────────── Testes
+pytest==9.1.1
+pytest-asyncio==1.4.0

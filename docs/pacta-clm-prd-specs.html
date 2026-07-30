@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pacta CLM — PRD + SPECS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --orange: #EA5B0C; --gray: #575756; --black: #181B1C;
+      --silver: #706F6F; --light: #E7E6E6; --white: #FFFFFF;
+      --radius: 6px;
+    }
+    body { font-family:'Inter','Helvetica Neue',Arial,sans-serif; background:var(--white); color:var(--black); font-size:15px; font-weight:300; line-height:1.6; }
+    .topbar { position:sticky; top:0; z-index:100; background:var(--black); border-bottom:1px solid #2a2d2e; display:flex; align-items:center; justify-content:space-between; padding:0 32px; height:56px; }
+    .logo { display:flex; align-items:center; gap:10px; }
+    .logo-text { font-size:18px; font-weight:700; letter-spacing:0.08em; color:var(--white); }
+    .logo-text span { color:var(--orange); }
+    .logo-badge { font-size:10px; font-weight:500; letter-spacing:0.06em; background:rgba(234,91,12,0.15); color:var(--orange); border:1px solid rgba(234,91,12,0.3); border-radius:99px; padding:2px 8px; text-transform:uppercase; }
+    .topbar-meta { font-size:12px; color:var(--silver); }
+    .shell { display:flex; min-height:calc(100vh - 56px); }
+    .sidenav { width:240px; flex-shrink:0; background:#f8f8f8; border-right:1px solid var(--light); padding:24px 0; position:sticky; top:56px; height:calc(100vh - 56px); overflow-y:auto; }
+    .sidenav-section { margin-bottom:4px; }
+    .sidenav-label { font-size:10px; font-weight:600; letter-spacing:0.1em; color:var(--silver); text-transform:uppercase; padding:12px 24px 6px; }
+    .sidenav-item { display:block; width:100%; text-align:left; padding:7px 24px; font-size:13.5px; font-weight:400; color:var(--gray); background:none; border:none; cursor:pointer; border-left:2px solid transparent; transition:all 0.15s; }
+    .sidenav-item:hover { color:var(--black); background:rgba(0,0,0,0.04); }
+    .sidenav-item.active { color:var(--orange); border-left-color:var(--orange); background:rgba(234,91,12,0.06); font-weight:500; }
+    .content { flex:1; padding:48px 56px; max-width:1000px; }
+    .section { display:none; }
+    .section.active { display:block; }
+    .page-label { font-size:11px; font-weight:600; letter-spacing:0.1em; color:var(--orange); text-transform:uppercase; margin-bottom:8px; }
+    h1 { font-size:28px; font-weight:700; line-height:1.2; color:var(--black); margin-bottom:8px; }
+    h2 { font-size:20px; font-weight:600; color:var(--black); margin:40px 0 16px; padding-bottom:10px; border-bottom:1px solid var(--light); }
+    h3 { font-size:15px; font-weight:600; color:var(--black); margin:28px 0 10px; }
+    p { margin-bottom:12px; color:var(--black); }
+    .lead { font-size:16px; font-weight:300; color:var(--gray); line-height:1.7; margin-bottom:32px; }
+    hr { border:none; border-top:1px solid var(--light); margin:32px 0; }
+    code { font-family:'Courier New',monospace; font-size:13px; background:var(--light); padding:1px 5px; border-radius:3px; }
+    .callout { border-left:3px solid var(--orange); background:rgba(234,91,12,0.05); padding:14px 18px; border-radius:0 var(--radius) var(--radius) 0; margin:20px 0; }
+    .callout p { margin:0; font-size:14px; }
+    .callout.info { border-left-color:#3B82F6; background:rgba(59,130,246,0.05); }
+    .callout.success { border-left-color:#10B981; background:rgba(16,185,129,0.05); }
+    .callout.warn { border-left-color:#F59E0B; background:rgba(245,158,11,0.05); }
+    .card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin:20px 0; }
+    .card { border:1px solid var(--light); border-radius:var(--radius); padding:20px; background:var(--white); transition:border-color 0.15s; }
+    .card:hover { border-color:var(--orange); }
+    .card-icon { font-size:22px; margin-bottom:10px; }
+    .card-title { font-size:14px; font-weight:600; margin-bottom:6px; }
+    .card-desc { font-size:13px; color:var(--gray); font-weight:400; }
+    .table-wrap { overflow-x:auto; margin:16px 0; }
+    table { width:100%; border-collapse:collapse; font-size:13.5px; }
+    thead tr { border-bottom:2px solid var(--black); }
+    th { text-align:left; padding:10px 14px; font-weight:600; font-size:12px; letter-spacing:0.04em; color:var(--gray); text-transform:uppercase; }
+    td { padding:10px 14px; border-bottom:1px solid var(--light); vertical-align:top; }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:#fafafa; }
+    .badge { display:inline-block; font-size:11px; font-weight:500; padding:2px 8px; border-radius:99px; letter-spacing:0.03em; }
+    .badge-orange { background:rgba(234,91,12,0.12); color:#c44a08; }
+    .badge-gray   { background:var(--light); color:var(--gray); }
+    .badge-green  { background:rgba(16,185,129,0.12); color:#065f46; }
+    .badge-blue   { background:rgba(59,130,246,0.12); color:#1e40af; }
+    .badge-yellow { background:rgba(245,158,11,0.12); color:#92400e; }
+    .badge-red    { background:rgba(239,68,68,0.12); color:#991b1b; }
+    .persona-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:20px 0; }
+    .persona { border:1px solid var(--light); border-radius:var(--radius); padding:24px; }
+    .persona-role { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--orange); margin-bottom:6px; }
+    .persona-name { font-size:16px; font-weight:600; margin-bottom:8px; }
+    .persona-desc { font-size:13px; color:var(--gray); margin-bottom:14px; }
+    .persona-goals { list-style:none; }
+    .persona-goals li { font-size:13px; padding:3px 0; display:flex; gap:8px; align-items:flex-start; }
+    .persona-goals li::before { content:'→'; color:var(--orange); font-weight:500; flex-shrink:0; margin-top:1px; }
+    .feature-block { margin:24px 0; padding:24px; border:1px solid var(--light); border-radius:var(--radius); }
+    .feature-header { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    .feature-num { width:28px; height:28px; border-radius:50%; background:var(--orange); color:var(--white); font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .feature-title { font-size:16px; font-weight:600; }
+    .story { font-size:13px; padding:7px 0; border-top:1px solid var(--light); display:flex; gap:10px; }
+    .story:first-child { border-top:none; }
+    .story-role { font-weight:500; color:var(--orange); white-space:nowrap; }
+    .model-block { margin:20px 0; }
+    .model-name { font-size:14px; font-weight:700; color:var(--orange); font-family:'Courier New',monospace; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+    .model-fields { border:1px solid var(--light); border-radius:var(--radius); overflow:hidden; }
+    .field-row { display:grid; grid-template-columns:180px 130px 1fr; font-size:13px; border-bottom:1px solid var(--light); }
+    .field-row:last-child { border-bottom:none; }
+    .field-row:nth-child(even) { background:#fafafa; }
+    .field-row > * { padding:7px 12px; }
+    .field-name { font-family:'Courier New',monospace; font-weight:500; }
+    .field-type { color:var(--silver); font-family:'Courier New',monospace; font-size:12px; }
+    .field-desc { color:var(--gray); }
+    .field-header { background:var(--black); color:rgba(255,255,255,0.7); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; }
+    .flow { display:flex; align-items:center; gap:0; margin:20px 0; flex-wrap:wrap; row-gap:8px; }
+    .flow-step { background:var(--light); border-radius:var(--radius); padding:10px 16px; font-size:13px; font-weight:500; }
+    .flow-step.highlight { background:var(--orange); color:var(--white); }
+    .flow-arrow { color:var(--orange); padding:0 8px; font-size:16px; }
+    .arch-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:20px 0; }
+    .arch-box { border:1px solid var(--light); border-radius:var(--radius); padding:20px; }
+    .arch-layer { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--orange); margin-bottom:8px; }
+    .arch-tech { font-size:14px; font-weight:600; margin-bottom:6px; }
+    .arch-desc { font-size:12px; color:var(--gray); }
+    .kpi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:20px 0; }
+    .kpi { border:1px solid var(--light); border-radius:var(--radius); padding:20px; text-align:center; }
+    .kpi-val { font-size:28px; font-weight:700; color:var(--orange); line-height:1; }
+    .kpi-label { font-size:12px; color:var(--gray); margin-top:4px; }
+    .tag-list { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+    .tag { background:var(--light); color:var(--gray); font-size:12px; font-weight:500; padding:4px 10px; border-radius:99px; }
+    .print-btn { position:fixed; bottom:24px; right:24px; background:var(--orange); color:var(--white); border:none; border-radius:var(--radius); padding:10px 18px; font-size:13px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(234,91,12,0.3); transition:opacity 0.15s; }
+    .print-btn:hover { opacity:0.9; }
+    .swatch-row { display:flex; align-items:center; gap:10px; }
+    .swatch { width:16px; height:16px; border-radius:4px; flex-shrink:0; border:1px solid rgba(0,0,0,0.1); }
+    @media print {
+      .sidenav,.print-btn,.topbar { display:none !important; }
+      .shell { display:block; }
+      .content { padding:24px; max-width:100%; }
+      .section { display:block !important; page-break-before:always; }
+      .section:first-of-type { page-break-before:avoid; }
+    }
+    @media (max-width:768px) { .sidenav { display:none; } .content { padding:24px 20px; } .persona-grid,.arch-grid,.kpi-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">
+    <span class="logo-text">Pact<span>a</span></span>
+    <span class="logo-badge">CLM · IA · SaaS B2B</span>
+  </div>
+  <div class="topbar-meta">PRD + SPECS · v1.0 · Julho 2026</div>
+</header>
+
+<div class="shell">
+  <nav class="sidenav">
+    <div class="sidenav-section">
+      <div class="sidenav-label">Visão Geral</div>
+      <button class="sidenav-item active" onclick="show('overview')">Introdução</button>
+      <button class="sidenav-item" onclick="show('personas')">Personas</button>
+      <button class="sidenav-item" onclick="show('metrics')">Métricas de Sucesso</button>
+    </div>
+    <div class="sidenav-section">
+      <div class="sidenav-label">PRD</div>
+      <button class="sidenav-item" onclick="show('features')">Funcionalidades MVP</button>
+      <button class="sidenav-item" onclick="show('stories')">User Stories</button>
+      <button class="sidenav-item" onclick="show('ux')">UX &amp; Design</button>
+      <button class="sidenav-item" onclick="show('nfr')">Req. Não Funcionais</button>
+    </div>
+    <div class="sidenav-section">
+      <div class="sidenav-label">SPECS</div>
+      <button class="sidenav-item" onclick="show('arch')">Arquitetura</button>
+      <button class="sidenav-item" onclick="show('models')">Modelos de Dados</button>
+      <button class="sidenav-item" onclick="show('api')">APIs</button>
+      <button class="sidenav-item" onclick="show('flows')">Fluxos de Sistema</button>
+      <button class="sidenav-item" onclick="show('roles')">Controle de Acesso</button>
+    </div>
+    <div class="sidenav-section">
+      <div class="sidenav-label">Roadmap</div>
+      <button class="sidenav-item" onclick="show('roadmap')">Fases &amp; Backlog</button>
+    </div>
+  </nav>
+
+  <main class="content">
+
+    <!-- ══════════════════════════════════════════════════════════ OVERVIEW -->
+    <section id="overview" class="section active">
+      <div class="page-label">Documento de Requisitos de Produto</div>
+      <h1>Pacta — CLM com IA para qualquer empresa</h1>
+      <p class="lead">Plataforma comercial de gestão do ciclo de vida de contratos (CLM), <strong>horizontal e multi-tenant</strong>, construída a partir de um motor já validado em produção real (repositório, templates, aprovação por alçadas, assinatura eletrônica, SLA, gestão de prazos e seis agentes de IA), generalizado para qualquer setor e empacotado como SaaS vendável para empresas brasileiras de médio porte.</p>
+
+      <div class="callout">
+        <p><strong>Tese do produto:</strong> O mercado brasileiro de CLM hoje se divide entre plataformas de assinatura que viraram CLM "por cima" (ClickSign, Autentique, Zapsign) e CLMs corporativos caros e genéricos demais para PME (WebDox, DocuSign CLM). O Pacta entra como CLM <strong>nativo de IA</strong> — os seis agentes já validados internamente (redator, revisor jurídico, briefing de aprovação, gestor de prazos, extrator, leitor de marcos) são o diferencial competitivo, não um adicional.</p>
+      </div>
+
+      <div class="callout warn">
+        <p><strong>Base de partida:</strong> ~70% do motor central (contratos, templates, aprovação por alçadas, workflow de assinatura, SLA por etapa, gestão ativa de prazos, agentes de IA) já existe e está testado em produção real. O trabalho de comercialização é principalmente <strong>generalização</strong> (remover o que é hardcoded de imobiliário) e <strong>multi-tenancy</strong> (transformar um único cliente interno em N clientes isolados) — não construção do zero.</p>
+      </div>
+
+      <h2>Contexto e Problema</h2>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">📂</div>
+          <div class="card-title">Contratos espalhados</div>
+          <div class="card-desc">Em qualquer empresa de médio porte, contratos vivem em e-mail, Drive/SharePoint sem padrão e planilhas de controle manual — não é um problema exclusivo do setor imobiliário.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">⚖️</div>
+          <div class="card-title">Prazos perdidos = risco</div>
+          <div class="card-desc">Renovação automática indesejada, multa por rescisão fora do prazo, certidão de fornecedor vencida sem ninguém perceber — o custo de um prazo esquecido é sempre desproporcional ao esforço de monitorá-lo.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🧩</div>
+          <div class="card-title">CLMs genéricos exigem meses de setup</div>
+          <div class="card-desc">Ferramentas corporativas de CLM (WebDox, DocuSign CLM, ContractPodAi) são poderosas, mas o tempo de implantação e o preço afastam empresas de 50–500 funcionários — o segmento mais mal atendido do mercado.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🤝</div>
+          <div class="card-title">Assinatura sem contexto de negócio</div>
+          <div class="card-desc">Plataformas de assinatura eletrônica (ClickSign, Autentique) resolvem a assinatura, mas não o ciclo de vida completo: quem aprova, com que alçada, com que prazo — isso ainda vira planilha paralela.</div>
+        </div>
+      </div>
+
+      <h2>Objetivos do Produto</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Objetivo</th><th>Indicador</th><th>Meta</th></tr></thead>
+          <tbody>
+            <tr><td>Implantação assistida ágil</td><td>Dias úteis entre fechamento comercial e primeiro contrato ativo</td><td>&lt; 10 dias úteis, com acompanhamento dedicado do time Pacta</td></tr>
+            <tr><td>Reduzir tempo de ciclo de assinatura dos clientes</td><td>Dias criação → assinatura completa</td><td>&lt; 48h (mediana entre tenants)</td></tr>
+            <tr><td>Eliminar vencimentos não monitorados</td><td>Contratos expirados sem tratamento registrado</td><td>Zero por tenant ativo</td></tr>
+            <tr><td>Validar isolamento multi-tenant</td><td>Incidentes de vazamento cross-tenant</td><td>Zero (auditado em pentest antes do GA)</td></tr>
+            <tr><td>Tração comercial inicial</td><td>Tenants pagantes ativos</td><td>15 tenants em 3 setores distintos em 6 meses</td></tr>
+            <tr><td>Retenção</td><td>Churn mensal de tenants pagantes</td><td>&lt; 3%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Categorias de Contrato — Configuráveis, Não Fixas</h2>
+      <p style="font-size:14px;color:var(--gray)">Diferente da versão original de referência (que tinha 14 tipos de contrato imobiliário fixos no schema), o Pacta trata categoria de contrato como <strong>dado do tenant</strong>, não do produto. Durante a implantação, o time Pacta e o cliente escolhem juntos um "pacote de partida" que pré-popula categorias e templates de exemplo — ponto de partida da conversa de configuração, não uma tela em branco — e o cliente segue ajustando livremente depois.</p>
+      <div class="tag-list">
+        <span class="tag">Pacote Genérico</span>
+        <span class="tag">Pacote Jurídico &amp; Serviços</span>
+        <span class="tag">Pacote Compras &amp; Fornecedores</span>
+        <span class="tag">Pacote RH &amp; Pessoas</span>
+        <span class="tag">Pacote Comercial &amp; Vendas</span>
+        <span class="tag">Pacote Imobiliário (legado, disponível como opção)</span>
+      </div>
+
+      <h2>Modelo de Negócio — Planos</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Plano</th><th>Preço</th><th>Limites</th><th>Diferenciais</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Starter</strong></td><td>R$ 490/mês</td><td>Até 10 usuários</td><td>1 categoria pré-configurada, assinatura ilimitada na conta do próprio cliente, implantação assistida enxuta, suporte por e-mail</td></tr>
+            <tr><td><strong>Growth</strong></td><td>R$ 1.490/mês</td><td>Até 50 usuários</td><td>Categorias ilimitadas, 6 agentes de IA, SLA/alçadas configuráveis, negociação de minuta, implantação assistida completa, suporte prioritário</td></tr>
+            <tr><td><strong>Enterprise</strong></td><td>Sob consulta</td><td>Usuários sob volume</td><td>SSO Google/Microsoft, schema dedicado, SLA 99,9%, implantação com gerente de conta dedicado, DPA/LGPD customizado</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <p><strong>Por que não há limite de envelopes de assinatura:</strong> o Pacta <em>integra</em> uma plataforma de assinatura em vez de fornecê-la — e a recomendação é que cada tenant conecte <strong>a própria conta ClickSign</strong> (credenciais do cliente, configuradas na implantação). Nesse modelo o Pacta não tem custo marginal por envelope: quem paga a assinatura é o cliente, direto ao provedor, na tabela que ele já negociou. Cobrar por envelope seria inventar um custo que não existe, criar uma objeção de venda ("já pago o ClickSign, por que pago de novo?") e obrigar a construir todo um subsistema de medição e overage no MVP. O preço fica ancorado em <strong>usuários + nível de funcionalidade</strong>, que é o que realmente escala com o valor entregue. Para clientes sem conta própria, o time comercial oferece a conta gerenciada pela Pacta como <em>add-on</em> opcional, com repasse de custo — aí sim medido, mas como exceção contratada, não como regra do produto.</p>
+      </div>
+      <p style="font-size:13px;color:var(--gray)">Todos os planos passam por uma conversa comercial e implantação acompanhada pelo time Pacta — não há cadastro self-service direto no site.</p>
+
+      <h2>Escopo do MVP Comercial</h2>
+      <div class="callout success">
+        <p><strong>Incluído no MVP:</strong> Processo comercial consultivo com implantação assistida pelo time Pacta · Categorias de contrato configuráveis por tenant · Templates com campos dinâmicos · <strong>Solicitação de contrato como ponto de entrada único, com anexo de minuta de terceiro e análise jurídica apoiada por IA</strong> · <strong>Chat interno por contrato e por solicitação</strong> · Workflow de aprovação por alçadas · Assinatura eletrônica via ClickSign · Negociação da minuta com a contraparte · Alertas de vencimento e marcos com digest diário · Aditivos e cadeia contratual · Central de contrapartes + documentos de compliance · SLA por etapa e dashboard · Seis agentes de IA generalizados · Billing por assentos</p>
+      </div>
+      <div class="callout warn">
+        <p><strong>Fora do MVP (Fase 2+):</strong> Assinatura internacional (DocuSign) · Internacionalização (i18n/multi-moeda) · Marketplace de templates por setor · App mobile nativo · Integrações com ERPs (SAP, TOTVS, Sienge) · White-label/revenda · SSO customizado fora de Google/Microsoft</p>
+      </div>
+
+      <h2>Premissas</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Premissa</th><th>Justificativa</th></tr></thead>
+          <tbody>
+            <tr><td>Multi-tenant desde o dia 1, schema-per-tenant no PostgreSQL</td><td>Isolamento mais forte que <code>tenant_id</code> em tabela compartilhada — argumento de venda para clientes sensíveis a compliance, sem o custo operacional de instância dedicada por cliente</td></tr>
+            <tr><td>Mercado-alvo inicial: Brasil, PME/médio porte (50–500 funcionários)</td><td>Segmento pior atendido: caro demais para os CLMs enterprise, complexo demais para resolver só com uma ferramenta de assinatura</td></tr>
+            <tr><td>Login por e-mail/senha + SSO opcional (Google/Microsoft) no Enterprise</td><td>Diferente da versão de uso interno original (MSAL exclusivo) — cliente comercial não pode exigir Azure AD de todo mundo</td></tr>
+            <tr><td>Assinatura via ClickSign (não nativa), abstração <code>SignatureProvider</code> mantida, com credenciais do próprio tenant</td><td>Mesma decisão de integração validada na versão original, agora com a conta do cliente: elimina custo marginal por envelope para a Pacta, remove a objeção de pagar assinatura duas vezes e dispensa medição/overage no MVP</td></tr>
+            <tr><td>Categorias de contrato e campos totalmente configuráveis por tenant</td><td>Pré-requisito para vender fora do setor imobiliário — nenhum enum de contrato pode ficar fixo no schema do produto</td></tr>
+            <tr><td>Interface radicalmente simples permanece o diferencial de UX</td><td>Mesmo princípio do produto interno: usuário de negócio sem treinamento jurídico deve conseguir operar sozinho no dia a dia, depois de implantado</td></tr>
+            <tr><td>Venda consultiva com implantação assistida pelo time Pacta, não self-service</td><td>Categorias, alçadas e SLA variam muito entre empresas — uma configuração inicial acompanhada evita abandono no onboarding e garante que o pacote de setor realmente reflita a operação do cliente</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ PERSONAS -->
+    <section id="personas" class="section">
+      <div class="page-label">PRD — Usuários</div>
+      <h1>Personas</h1>
+      <p class="lead">O produto comercial soma três papéis novos ao elenco do produto interno: quem <em>compra</em> o Pacta, quem gerencia prazos e SLAs no dia a dia, e quem opera a própria SaaS por trás dos panos.</p>
+
+      <div class="persona-grid">
+        <div class="persona">
+          <div class="persona-role">Compradora · Decisora (novo)</div>
+          <div class="persona-name">Fernanda Cabral</div>
+          <div class="persona-desc">Diretora Administrativa de uma rede de clínicas com 220 funcionários. Avalia ferramentas de CLM depois de perder uma renovação de contrato de aluguel sem querer. Não é técnica; prefere entender o produto numa conversa com quem vende do que se virar sozinha numa ferramenta nova, e decide por ROI e confiança na implantação.</div>
+          <ul class="persona-goals">
+            <li>Entender, numa conversa com o time comercial, se o Pacta resolve o problema real da empresa dela</li>
+            <li>Ver uma demonstração com um caso de uso próximo da realidade da clínica, não um pacote genérico</li>
+            <li>Ter clareza do investimento e do que está incluso antes de assinar</li>
+            <li>Contar com o time Pacta para migrar os contratos existentes durante a implantação, sem sua equipe ter que digitar tudo de novo sozinha</li>
+          </ul>
+        </div>
+        <div class="persona">
+          <div class="persona-role">Admin do Tenant (novo)</div>
+          <div class="persona-name">Ricardo Nunes</div>
+          <div class="persona-desc">TI/Operações da empresa cliente. Trabalha lado a lado com o time de implantação da Pacta na configuração inicial (categorias, alçadas, SLA) e depois assume a operação do dia a dia sozinho.</div>
+          <ul class="persona-goals">
+            <li>Configurar categorias e campos personalizados com apoio do time de implantação, sem precisar adivinhar sozinho o que faz sentido</li>
+            <li>Convidar e desativar usuários em lote depois que o tenant está no ar</li>
+            <li>Ver quantos usuários ativos tem em relação ao limite do plano</li>
+            <li>Acompanhar o consumo do plano e pedir upgrade rapidamente ao time comercial quando necessário</li>
+          </ul>
+        </div>
+        <div class="persona">
+          <div class="persona-role">Jurídico / Aprovador</div>
+          <div class="persona-name">Camila Duarte</div>
+          <div class="persona-desc">Advogada interna (ou terceirizada) da empresa cliente. Cria templates, revisa contratos antes da assinatura e usa os agentes de IA para não perder tempo com leitura completa de documentos padrão.</div>
+          <ul class="persona-goals">
+            <li>Criar template com variáveis reaproveitável por qualquer área da empresa</li>
+            <li>Receber o relatório de risco do Agente Revisor antes de abrir o documento</li>
+            <li>Configurar alçadas por valor e tipo de contrato conforme a política interna</li>
+            <li>Exportar dossiê de um contrato para auditoria externa</li>
+          </ul>
+        </div>
+        <div class="persona">
+          <div class="persona-role">Usuário de Negócio · Solicitante</div>
+          <div class="persona-name">Bruno Faria</div>
+          <div class="persona-desc">Compras, vendas ou RH — a área que precisa do contrato no dia a dia. Papel <code>visualizador</code>: é o perfil mais numeroso do tenant. Não tem formação jurídica e não deveria precisar de uma; hoje pede contrato por WhatsApp e fica no escuro sobre o andamento. Frequentemente já tem em mãos a minuta que o fornecedor mandou ou a proposta comercial fechada.</div>
+          <ul class="persona-goals">
+            <li>Abrir uma solicitação em poucos minutos, sem precisar saber qual modelo usar</li>
+            <li>Anexar a minuta que o fornecedor mandou ou a proposta comercial junto do pedido</li>
+            <li>Acompanhar o andamento sem ter que cobrar o Jurídico por mensagem</li>
+            <li>Ser avisado quando o contrato começar a andar e quando estiver pronto para assinatura</li>
+            <li>Ver quem já assinou e quem está pendente nos contratos que ele originou</li>
+          </ul>
+        </div>
+        <div class="persona">
+          <div class="persona-role">Gestor de Contratos</div>
+          <div class="persona-name">Patrícia Lemos</div>
+          <div class="persona-desc">Responsável por acompanhar o pipeline de contratos da empresa cliente no dia a dia: garante o cumprimento de prazos contratuais e SLAs, cobra responsáveis por etapas atrasadas e reporta a performance para a diretoria. Não cria nem aprova contratos — sua função é fazer o processo andar sem gargalos.</div>
+          <ul class="persona-goals">
+            <li>Ver em uma tela só todos os contratos em andamento com status de prazo e SLA</li>
+            <li>Cobrar responsáveis por etapas atrasadas sem sair do sistema</li>
+            <li>Configurar SLAs e regras de escalonamento por categoria de contrato</li>
+            <li>Garantir que nenhum prazo crítico fique sem responsável designado</li>
+            <li>Gerar relatório periódico de performance de contratos para a diretoria</li>
+          </ul>
+        </div>
+        <div class="persona">
+          <div class="persona-role">Signatário Externo</div>
+          <div class="persona-name">Contraparte (cliente, fornecedor ou parceiro)</div>
+          <div class="persona-desc">Recebe link para assinar. Não tem conta no Pacta e não deveria precisar de uma — independente de qual empresa cliente do Pacta está enviando o contrato.</div>
+          <ul class="persona-goals">
+            <li>Abrir o link no celular e assinar em menos de 2 minutos</li>
+            <li>Ler o contrato completo sem baixar nada</li>
+            <li>Recusar com um comentário se algo estiver errado</li>
+          </ul>
+        </div>
+        <div class="persona">
+          <div class="persona-role">Time Pacta — Vendas &amp; Implantação (interno, novo)</div>
+          <div class="persona-name">Comercial / Customer Success</div>
+          <div class="persona-desc">Equipe da própria Pacta. Conduz a conversa comercial e a demonstração, fecha o contrato e depois assume a implantação assistida — provisiona o tenant, configura o pacote de setor junto com o cliente e acompanha até os primeiros contratos rodarem sozinhos. Só depois disso o suporte contínuo vira reativo.</div>
+          <ul class="persona-goals">
+            <li>Conduzir a demonstração e entender a operação do cliente antes de propor um pacote de setor</li>
+            <li>Provisionar o tenant e configurar categorias/alçadas junto com o admin do cliente</li>
+            <li>Acompanhar os primeiros contratos até a equipe do cliente operar de forma independente</li>
+            <li>Ver o status de saúde de cada tenant num painel único e sinalizar upsell/risco de churn</li>
+            <li>Investigar um chamado de suporte com acesso auditado e temporário ao tenant</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>Jornada Crítica — Do Fechamento Comercial ao Primeiro Contrato Assinado</h2>
+      <div class="flow">
+        <div class="flow-step">Fernanda conversa com o comercial e vê uma demonstração</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Contrato fechado · time de implantação assume</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Schema do tenant provisionado e pacote de setor configurado com Ricardo</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Bruno cria o primeiro contrato via formulário, com apoio da implantação</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Camila aprova com briefing gerado por IA</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Contraparte assina via ClickSign</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Contrato vigente · time de implantação confirma autonomia do cliente</div>
+      </div>
+
+      <h2>Jornada — Gestão de Prazos e SLA</h2>
+      <div class="flow">
+        <div class="flow-step">Contrato entra na janela de vencimento (D-90)</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Patrícia recebe o item na fila de tratamento</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Designa responsável e ação esperada (renovar/renegociar/encerrar)</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Sistema escala automaticamente se o prazo interno vencer sem ação</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Resultado registrado · relatório de SLA gerado para a diretoria</div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ METRICS -->
+    <section id="metrics" class="section">
+      <div class="page-label">PRD — Sucesso</div>
+      <h1>Métricas de Sucesso</h1>
+      <p class="lead">Além das métricas operacionais herdadas do produto interno (ciclo de assinatura, prazos, SLA), o produto comercial precisa provar tração de negócio: ativação, retenção e receita.</p>
+
+      <div class="kpi-grid">
+        <div class="kpi">
+          <div class="kpi-val">&lt; 10 dias</div>
+          <div class="kpi-label">Do fechamento comercial ao primeiro contrato ativo (implantação assistida)</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-val">&lt; 48h</div>
+          <div class="kpi-label">Ciclo médio criação → todas as assinaturas</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-val">0</div>
+          <div class="kpi-label">Incidentes de isolamento cross-tenant</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-val">&lt; 3%</div>
+          <div class="kpi-label">Churn mensal de tenants pagantes</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-val">15</div>
+          <div class="kpi-label">Tenants pagantes em 3+ setores distintos (6 meses)</div>
+        </div>
+      </div>
+
+      <h2>Métricas por Categoria</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Métrica</th><th>Categoria</th><th>Meta 6 meses</th></tr></thead>
+          <tbody>
+            <tr><td>Tempo médio entre abertura da Solicitação e triagem do Jurídico</td><td><span class="badge badge-blue">Eficiência</span></td><td>&lt; 24h úteis</td></tr>
+            <tr><td>Solicitações sem triagem há mais de 24h úteis</td><td><span class="badge badge-red">Risco</span></td><td>Zero</td></tr>
+            <tr><td>Contratos com Solicitação de origem (vs. criados direto)</td><td><span class="badge badge-yellow">Governança</span></td><td>&gt; 90%</td></tr>
+            <tr><td>Tempo médio até vínculo/uso do primeiro template</td><td><span class="badge badge-blue">Eficiência</span></td><td>&lt; 1 dia útil</td></tr>
+            <tr><td>Tempo médio para coleta de assinaturas</td><td><span class="badge badge-blue">Eficiência</span></td><td>&lt; 48h</td></tr>
+            <tr><td>Contratos com vencimento não monitorado</td><td><span class="badge badge-red">Risco</span></td><td>0%</td></tr>
+            <tr><td>MRR (receita recorrente mensal)</td><td><span class="badge badge-orange">Negócio</span></td><td>R$ 40 mil</td></tr>
+            <tr><td>Churn mensal de tenants pagantes</td><td><span class="badge badge-orange">Negócio</span></td><td>&lt; 3%</td></tr>
+            <tr><td>Ativação (tenant com ≥1 contrato assinado em até 30 dias após o fechamento)</td><td><span class="badge badge-orange">Negócio</span></td><td>&gt; 80%</td></tr>
+            <tr><td>Uso dos agentes de IA por tenant ativo</td><td><span class="badge badge-green">Adoção</span></td><td>&gt; 50% dos tenants usam ao menos 1 agente/semana</td></tr>
+            <tr><td>NPS de signatários externos</td><td><span class="badge badge-green">Experiência</span></td><td>&gt; 70</td></tr>
+            <tr><td>Uptime da plataforma (por tenant)</td><td><span class="badge badge-green">Confiabilidade</span></td><td>99,5% (99,9% Enterprise)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Critérios de Go-Live</h2>
+      <div class="callout success"><p>✅ Provisionamento de schema automatizado testado com 5 tenants sintéticos simultâneos.</p></div>
+      <div class="callout success"><p>✅ Pentest de isolamento multi-tenant concluído sem achado crítico.</p></div>
+      <div class="callout success"><p>✅ Fluxo completo (implantação → solicitação → triagem → aprovação → assinatura) testado ponta a ponta com 3 tenants piloto de setores diferentes.</p></div>
+      <div class="callout success"><p>✅ Os três caminhos de Solicitação validados: modelo interno, minuta de terceiro com extração por IA, e pedido sem documento.</p></div>
+      <div class="callout success"><p>✅ Extrator, Revisor e Redator acionáveis na análise, com saída revisável e registro de quem acionou.</p></div>
+      <div class="callout success"><p>✅ Teste de isolamento do chat: mensagem interna comprovadamente inacessível pelo link público de negociação.</p></div>
+      <div class="callout success"><p>✅ Billing integrado processando cobrança recorrente por plano em sandbox, com bloqueio de convite ao atingir o limite de assentos.</p></div>
+      <div class="callout success"><p>✅ Motor de prazos validado em staging: itens gerados nas antecedências configuradas e entregues em <strong>um único digest diário por pessoa</strong>, com escalonamento ao vencer o prazo interno.</p></div>
+      <div class="callout success"><p>✅ Teste de volume do digest: usuário com 20 prazos simultâneos recebe exatamente 1 e-mail, sem duplicidade e ordenado por severidade.</p></div>
+      <div class="callout success"><p>✅ Um aditivo real criado a partir de um contrato vigente, propagando nova vigência ao contrato pai após assinatura completa.</p></div>
+      <div class="callout success"><p>✅ Seis agentes de IA validados com linguagem genérica (sem resíduo de vocabulário imobiliário) nos 3 tenants piloto.</p></div>
+      <div class="callout warn"><p>⚠️ <strong>Principal risco de mercado:</strong> concorrência direta e indireta com o próprio ClickSign, que fornece a assinatura do Pacta e vem expandindo funcionalidades de CLM. Mitigação detalhada na seção Roadmap.</p></div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ FEATURES -->
+    <section id="features" class="section">
+      <div class="page-label">PRD — MVP</div>
+      <h1>Funcionalidades MVP</h1>
+      <p class="lead">Treze módulos essenciais, cobrindo o ciclo completo: da <strong>solicitação aberta a qualquer colaborador</strong> até a gestão de prazos do contrato vigente, passando pela triagem do Jurídico, aprovação por alçadas, negociação com a contraparte e assinatura.</p>
+
+      <div class="feature-block">
+        <div class="feature-header">
+          <div class="feature-num">1</div>
+          <div class="feature-title">Processo Comercial e Implantação Assistida</div>
+          <span class="badge badge-red" style="margin-left:auto">Novo · Crítico</span>
+        </div>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:12px">Diferente de um SaaS de self-service puro, o Pacta é vendido por uma conversa comercial — entender o setor, o volume de contratos, a dor específica — seguida de uma implantação acompanhada pelo time Pacta, que configura o pacote de setor junto com o cliente, apoia a migração de contratos existentes e acompanha os primeiros contratos até a equipe do cliente operar sozinha. O provisionamento técnico do tenant continua totalmente automatizado por trás — só não é exposto como cadastro público self-service.</p>
+        <div class="tag-list">
+          <span class="tag">Conversa comercial e demonstração personalizada antes do fechamento</span>
+          <span class="tag">Provisionamento automático de schema (Alembic dinâmico), disparado pelo time de implantação</span>
+          <span class="tag">Configuração assistida de categorias, alçadas e SLA junto com o cliente</span>
+          <span class="tag">Migração de contratos legados com apoio do time (Agente Extrator)</span>
+          <span class="tag">Acompanhamento dos primeiros contratos até a operação ficar independente</span>
+          <span class="tag">Checklist de ativação guiado pela equipe de implantação</span>
+        </div>
+      </div>
+
+      <div class="feature-block">
+        <div class="feature-header">
+          <div class="feature-num">2</div>
+          <div class="feature-title">Categorias de Contrato Configuráveis</div>
+          <span class="badge badge-orange" style="margin-left:auto">Core</span>
+        </div>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:12px">O maior gap em relação ao produto interno: lá, o tipo de contrato era um ENUM fixo de 14 opções imobiliárias. Aqui, cada tenant define suas próprias categorias — com campos padrão sugeridos pelo pacote de setor, mas totalmente editáveis.</p>
+        <div class="tag-list">
+          <span class="tag">CRUD de categorias por tenant</span>
+          <span class="tag">Campos padrão sugeridos por pacote de setor</span>
+          <span class="tag">Ícone e cor por categoria (organização visual)</span>
+          <span class="tag">Categoria vinculada a template, alçada e SLA</span>
+        </div>
+      </div>
+
+      <div class="feature-block">
+        <div class="feature-header">
+          <div class="feature-num">3</div>
+          <div class="feature-title">Templates com Formulário de Preenchimento</div>
+          <span class="badge badge-orange" style="margin-left:auto">Core</span>
+        </div>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:12px">Mecanismo idêntico ao validado internamente: upload de .docx com variáveis <code>${campo}</code> detectadas automaticamente, ou editor rich-text. O usuário de negócio preenche um formulário; o sistema gera o contrato pronto.</p>
+        <div class="tag-list">
+          <span class="tag">Editor rich-text + upload de .docx</span>
+          <span class="tag">Variáveis dinâmicas com tags visuais inline</span>
+          <span class="tag">Versionamento de templates</span>
+          <span class="tag">Preview antes de gerar</span>
+          <span class="tag">Workflow de aprovação do template (rascunho → revisão → aprovado)</span>
+        </div>
+      </div>
+
+      <div class="feature-block">
+        <div class="feature-header">
+          <div class="feature-num">4</div>
+          <div class="feature-title">Solicitação de Contrato — Ponto de Entrada Único</div>
+          <span class="badge badge-red" style="margin-left:auto">Core · Crítico</span>
+        </div>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:12px">Todo contrato nasce como uma <strong>Solicitação</strong>, não como um contrato. Qualquer colaborador da empresa cliente pode abrir uma — e não precisa entender de contrato para isso. Ele descreve o que precisa e, opcionalmente, escolhe um modelo disponível ou anexa o que já tem em mãos: a minuta que o fornecedor mandou, uma proposta comercial, um e-mail de acordo. O Jurídico recebe essa fila e faz a análise — <strong>é dessa análise que a minuta do contrato nasce</strong>, com apoio dos agentes de IA que ele aciona quando quiser. Só ao final dela a Solicitação vira um contrato de verdade.</p>
+        <div class="callout warn" style="margin:12px 0 16px"><p><strong>O problema que isso resolve:</strong> sem um ponto de entrada formal, o pedido de contrato chega por WhatsApp, e-mail ou corredor — e o Jurídico só descobre que existe um negócio em andamento quando alguém cobra urgência. Pior: se qualquer pessoa com acesso pudesse criar contrato direto, contratos nasceriam sem triagem nenhuma. A Solicitação inverte isso: pedir é fácil e aberto a todos; <em>transformar em contrato</em> é uma decisão do Jurídico, sempre registrada.</p></div>
+        <h3 style="margin:0 0 10px;font-size:14px;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em">Três origens possíveis</h3>
+        <div class="table-wrap" style="margin-top:0">
+          <table>
+            <thead><tr><th>Origem</th><th>O que o solicitante faz</th><th>O que o Jurídico faz na triagem</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Modelo interno</strong></td><td>Escolhe um modelo já aprovado da lista disponível para ele</td><td>Confirma o modelo (ou troca por outro) e aciona o <strong>Redator</strong> para gerar a minuta com os dados do pedido</td></tr>
+              <tr><td><strong>Minuta de terceiro</strong></td><td>Anexa o contrato que a contraparte enviou</td><td>Aciona o <strong>Extrator</strong> para ler o documento e o <strong>Revisor Jurídico</strong> para apontar os desvios, e então decide entre negociar o texto da contraparte ou substituir por modelo interno</td></tr>
+              <tr><td><strong>Sem documento</strong></td><td>Só descreve a necessidade — anexa proposta comercial, e-mail ou nada</td><td>Escolhe o modelo adequado e aciona o <strong>Redator</strong>, ou redige manualmente do zero</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout info" style="margin:12px 0 16px"><p><strong>A minuta é produto da análise jurídica, não da solicitação.</strong> Nenhum agente roda automaticamente ao abrir uma Solicitação — o Jurídico decide quando e qual acionar, e o resultado é sempre uma sugestão revisável. Isso mantém a responsabilidade técnica onde ela precisa estar: o agente acelera a leitura e a redação, o advogado responde pelo texto final.</p></div>
+        <div class="tag-list">
+          <span class="tag">Formulário simples, aberto a qualquer usuário do tenant</span>
+          <span class="tag">Escolha opcional de modelo — nunca obrigatória</span>
+          <span class="tag">Anexo de minuta de terceiro, proposta comercial ou documento de apoio</span>
+          <span class="tag">Fila de triagem para o Jurídico, com SLA próprio</span>
+          <span class="tag">Agentes Redator, Extrator e Revisor acionáveis sob demanda na análise</span>
+          <span class="tag">Minuta gerada a partir da análise, antes da conversão em contrato</span>
+          <span class="tag">Recusa com pedido de mais informação, sem virar contrato</span>
+          <span class="tag">Solicitante acompanha o status sem precisar cobrar ninguém</span>
+          <span class="tag">Contrato guarda a Solicitação de origem (<code>request_id</code>)</span>
+        </div>
+      </div>
+
+      <div class="feature-block">
+        <div class="feature-header">
+          <div class="feature-num">5</div>
+          <div class="feature-title">Aprovação por Alçadas — Configurável, Não Redundante com a Assinatura</div>
+          <span class="badge badge-blue" style="margin-left:auto">Governança</span>
+        </div>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:12px">Regras por categoria de contrato e faixa de valor, configuráveis pelo admin do tenant — sem depender de suporte da Pacta para ajustar a política de aprovação da empresa cliente. O nível de exigência é proporcional ao risco: nem todo contrato precisa do mesmo controle.</p>
+        <div class="callout info" style="margin:12px 0 16px">
+          <p><strong>Por que aprovação continua necessária mesmo quando todos vão assinar:</strong> assinatura é o ato jurídico de consentimento — muitas vezes feito por quem tem alçada de assinatura, não necessariamente por quem avaliou o risco e o valor do negócio. Se a única barreira de controle for a assinatura, o primeiro (e único) momento em que alguém para para analisar o contrato é depois que a contraparte já recebeu o documento — tarde e caro demais para renegociar uma cláusula problemática, e ruim para a imagem da empresa. A aprovação existe para pegar o problema <em>antes</em> de o documento sair, com quem tem contexto de risco e valor; não é um passo redundante com a assinatura, é um controle em outro momento e com outro propósito. A recomendação é não eliminar a etapa, e sim torná-la proporcional: automática e silenciosa para contratos de baixo risco (template pré-aprovado, valor abaixo do limite), explícita e obrigatória para o resto — sempre com registro de auditoria, mesmo quando automática.</p>
+        </div>
+        <div class="tag-list">
+          <span class="tag">Regras por categoria e valor</span>
+          <span class="tag">Aprovação automática para templates pré-aprovados abaixo do limite de alçada</span>
+          <span class="tag">Aprovação explícita obrigatória acima do limite ou em categorias marcadas como sensíveis</span>
+          <span class="tag">Aprovação sequencial ou paralela</span>
+          <span class="tag">Aprovação via e-mail (sem abrir o sistema)</span>
+          <span class="tag">Rejeição com comentário obrigatório</span>
+          <span class="tag">Trilha de auditoria de toda decisão, mesmo quando automática</span>
+        </div>
+      </div>
+
+      <div class="feature-block">
+        <div class="feature-header">
+          <div class="feature-num">6</div>
+          <div class="feature-title">Assinatura Eletrônica via ClickSign</div>
+          <span class="badge badge-orange" style="margin-left:auto">Core</span>
+        </div>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:12px">Camada <code>SignatureProvider</code> isola a integração — hoje só ClickSign, mas a interface já está pronta para um segundo provedor quando fizer sentido comercial (ex.: cliente Enterprise que já usa DocuSign). Cada tenant conecta <strong>as próprias credenciais</strong> na implantação: os envelopes saem da conta do cliente, com a marca e o contrato comercial dele junto ao provedor — sem limite imposto pelo Pacta e sem custo marginal por assinatura.</p>
+        <div class="tag-list">
+          <span class="tag">SignatureProvider (abstração)</span>
+          <span class="tag">ClickSign API 3.0</span>
+          <span class="tag">Credenciais por tenant, configuradas na implantação</span>
+          <span class="tag">Assinaturas ilimitadas — custo fica com o provedor do cliente</span>
+          <span class="tag">Webhook recebe PDF assinado automaticamente</span>
+          <span class="tag">Hash SHA-256 do documento</span>
+          <span class="tag">Conta gerenciada pela Pacta como add-on opcional</span>
+        </div>
+      </div>
+
+      <div class="feature-block">
+        <div class="feature-header">
+          <div class="feature-num">7</div>
+          <div class="feature-title">Comunicação do Contrato — Chat Interno e Negociação Externa</div>
+          <span class="badge badge-blue" style="margin-left:auto">Diferencial</span>
+        </div>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:12px">Toda conversa sobre um contrato precisa morar no contrato. Hoje ela se espalha entre e-mail, WhatsApp e conversa de corredor — e quando alguém pergunta "por que aceitamos esse prazo?", seis meses depois, ninguém sabe responder. Este módulo cobre as duas conversas que existem em torno de um contrato, mantidas <strong>rigorosamente separadas</strong>.</p>
+
+        <h3 style="margin:0 0 10px;font-size:14px;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em">Chat interno do contrato</h3>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:10px">Thread de mensagens visível a todos que têm acesso ao contrato, dentro da empresa. Registra decisões, dúvidas e combinados: por que o desconto foi aceito, quem autorizou a exceção, o que o comercial prometeu ao cliente. É o histórico que transforma um contrato de arquivo em ativo de conhecimento — e vale tanto durante a negociação quanto anos depois, na renovação ou num litígio.</p>
+        <div class="tag-list" style="margin-bottom:18px">
+          <span class="tag">Mensagem com autor, data e hora</span>
+          <span class="tag">Visível a todos com acesso ao contrato — inclusive o solicitante</span>
+          <span class="tag">Herda a conversa da Solicitação de origem, sem perder contexto na conversão</span>
+          <span class="tag">Menção a pessoa (@) gera item no digest dela</span>
+          <span class="tag">Entradas automáticas de sistema na mesma linha do tempo (aprovado, assinado, aditivado)</span>
+          <span class="tag">Somente leitura após o contrato encerrar — histórico não se reescreve</span>
+        </div>
+
+        <h3 style="margin:0 0 10px;font-size:14px;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em">Negociação com a contraparte</h3>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:10px">Antes de seguir para assinatura, a contraparte pode comentar na minuta por um link seguro — sem criar conta — sugerindo ajustes de cláusula, prazo ou valor. O Jurídico decide incorporar ou recusar; nada substitui a minuta automaticamente.</p>
+        <div class="tag-list">
+          <span class="tag">Link de negociação com token (72h, sem criação de conta)</span>
+          <span class="tag">Comentário ou anexo de versão ajustada pela contraparte</span>
+          <span class="tag">Comparação lado a lado entre a versão original e a sugerida</span>
+          <span class="tag">Aceite ou recusa registrado pelo Jurídico</span>
+          <span class="tag">Histórico completo de rodadas de negociação no dossiê</span>
+        </div>
+
+        <div class="callout warn" style="margin-top:16px"><p><strong>Por que são duas threads e não uma:</strong> o chat interno contém exatamente o tipo de informação que nunca pode chegar à contraparte — margem aceitável, limite de negociação, avaliação de risco do fornecedor. Se as duas conversas compartilhassem a mesma tabela, um único erro em um filtro de visibilidade vazaria a estratégia interna pelo link de negociação. Separar no armazenamento transforma isso de <em>verificação em tempo de execução</em> em <strong>garantia estrutural</strong>: mensagem interna não tem como sair, porque não está na tabela que o link externo lê. Na tela do contrato as duas aparecem como abas de um mesmo painel — separação no dado, unificação na apresentação.</p></div>
+      </div>
+
+      <div class="feature-block">
+        <div class="feature-header">
+          <div class="feature-num">8</div>
+          <div class="feature-title">Alertas, Marcos e Gestão Ativa de Prazos</div>
+          <span class="badge badge-red" style="margin-left:auto">Diferencial</span>
+        </div>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:12px">O mesmo motor que evita perdas em contratos imobiliários (renovação, rescisão, opção de compra) se aplica a qualquer contrato: fim de vigência, renovação automática, marco de entrega. Cada marco carrega <strong>duas datas distintas</strong> — a data contratual (<code>due_date</code>, que não pode ser perdida) e a data-limite interna para agir (<code>internal_action_date</code>) — mais as antecedências de alerta. Quando o prazo entra na janela de proximidade, vira item de uma fila de tratamento ativo com responsável e ação esperada, e a ação "renovar" gera um aditivo já vinculado ao contrato original.</p>
+        <div class="callout warn" style="margin:12px 0 16px"><p><strong>Renovação automática é o caso mais perigoso:</strong> em contratos com <code>auto_renewal</code>, perder o prazo não deixa o contrato vencer — faz ele se renovar sozinho por outro ciclo inteiro. Por isso o alerta é calculado sobre a data-limite de aviso prévio (<code>notice_period_days</code>), não sobre o fim da vigência.</p></div>
+        <div class="callout info" style="margin:12px 0 16px"><p><strong>Um e-mail por dia, não um por prazo:</strong> os avisos nunca saem individualmente. Cada alerta vira um item pendente e um <strong>digest diário</strong> consolida tudo o que é responsabilidade daquela pessoa em uma única mensagem, ordenada por severidade. É a diferença entre uma ferramenta que ajuda e uma que treina o usuário a ignorar seus e-mails — quem recebe doze avisos por dia para de ler todos, inclusive o que importava.</p></div>
+        <div class="tag-list">
+          <span class="tag">Data contratual + data-limite interna por marco</span>
+          <span class="tag">Antecedências configuráveis (ex.: 90/60/30/15/7 dias)</span>
+          <span class="tag">Alerta calculado sobre o aviso prévio em contratos de renovação automática</span>
+          <span class="tag">Digest diário único por pessoa, agrupado por severidade</span>
+          <span class="tag">Horário de envio configurável por tenant, opção de dias úteis</span>
+          <span class="tag">Digest vazio não é enviado</span>
+          <span class="tag">Registro auditável item a item, independente do e-mail</span>
+          <span class="tag">Fila de tratamento com responsável e ação esperada</span>
+          <span class="tag">Cobrança periódica ao responsável até a resolução</span>
+          <span class="tag">Escalonamento se o prazo interno vencer sem ação</span>
+          <span class="tag">Ação "renovar" gera aditivo vinculado ao contrato original</span>
+        </div>
+      </div>
+
+      <div class="feature-block">
+        <div class="feature-header">
+          <div class="feature-num">9</div>
+          <div class="feature-title">Aditivos, Renovações e Cadeia Contratual</div>
+          <span class="badge badge-red" style="margin-left:auto">Core</span>
+        </div>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:12px">Contrato não é documento estático: prazo se estende, valor reajusta, escopo amplia. Um aditivo é criado <strong>sempre a partir da tela do contrato original</strong> — nasce já vinculado, herdando empresa, contraparte e categoria, sem risco de alguém esquecer de ligar os dois depois. Depois de totalmente assinado, o aditivo propaga a nova vigência e o novo valor ao contrato pai, e o motor de prazos recalcula os marcos automaticamente.</p>
+        <div class="tag-list">
+          <span class="tag">Criação exclusivamente a partir do contrato original</span>
+          <span class="tag">Tipos: aditivo · renovação · reajuste · rescisão · distrato · apostilamento</span>
+          <span class="tag">Numeração sequencial automática por contrato pai</span>
+          <span class="tag">Justificativa obrigatória, exibida no briefing de aprovação</span>
+          <span class="tag">Data de vigência própria, distinta da data de assinatura</span>
+          <span class="tag">Propagação de vigência e valor ao pai só após assinatura completa</span>
+          <span class="tag">Recálculo automático dos marcos e da fila de prazos</span>
+          <span class="tag">Cadeia completa visível no dossiê, sem sobrescrever histórico</span>
+        </div>
+      </div>
+
+      <div class="feature-block">
+        <div class="feature-header">
+          <div class="feature-num">10</div>
+          <div class="feature-title">Central de Contrapartes e Documentos de Compliance</div>
+          <span class="badge badge-blue" style="margin-left:auto">Diferencial</span>
+        </div>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:12px">Generaliza o módulo de "Fornecedores + Certidões" do v2 interno: qualquer contraparte recorrente (fornecedor, cliente, parceiro) vira um cadastro central reaproveitável, com documentos de compliance (CND, regularidade fiscal/trabalhista) monitorados por lembrete periódico — não só por vencimento de contrato.</p>
+        <div class="tag-list">
+          <span class="tag">Cadastro único de contraparte, reaproveitado entre contratos</span>
+          <span class="tag">Histórico consolidado por contraparte</span>
+          <span class="tag">Documentos de compliance com recorrência configurável</span>
+          <span class="tag">Notificação a múltiplos responsáveis</span>
+        </div>
+      </div>
+
+      <div class="feature-block">
+        <div class="feature-header">
+          <div class="feature-num">11</div>
+          <div class="feature-title">Camada de IA — Seis Agentes Generalizados</div>
+          <span class="badge badge-orange" style="margin-left:auto">AI First · Diferencial competitivo</span>
+        </div>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:12px">Seis agentes sobre a OpenAI API, com prompts reescritos para não presumir vocabulário de um setor específico — cada um lê a categoria de contrato do tenant e se adapta ao contexto. <strong>Três deles são ferramentas do Jurídico na análise da Solicitação</strong> e só rodam quando ele aciona; os outros três apoiam fases posteriores do ciclo.</p>
+
+        <h3 style="margin:0 0 4px;font-size:14px;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em">Acionados pelo Jurídico na análise da Solicitação</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Agente</th><th>O que faz</th><th>Entrega</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Extrator</strong></td><td>Lê a minuta de terceiro ou a proposta anexada e identifica partes, valores, vigência, obrigações e cláusulas relevantes</td><td>Dados estruturados com nível de confiança por campo, gravados em <code>request_attachments.extracted_data</code></td></tr>
+              <tr><td><strong>Revisor Jurídico</strong></td><td>Compara o documento com o padrão da categoria e aponta cláusulas ausentes, ambíguas ou desfavoráveis</td><td>Relatório de risco por cláusula (alto/médio/baixo), com posição no documento e sugestão de redação alternativa</td></tr>
+              <tr><td><strong>Redator</strong></td><td>Gera a minuta a partir do modelo escolhido + dados da Solicitação, ou reescreve trechos apontados pelo Revisor</td><td>Minuta em rascunho, sempre editável — é o texto que segue para o contrato ao converter</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout info" style="margin:4px 0 20px"><p><strong>Nenhum dos três roda sozinho.</strong> O Jurídico decide qual acionar e em que ordem — o caminho típico numa minuta de terceiro é Extrator → Revisor → Redator, mas num caso simples ele pode ir direto ao Redator, ou não usar nenhum. Toda saída é sugestão revisável: o agente acelera leitura e redação, o advogado responde pelo texto.</p></div>
+
+        <h3 style="margin:0 0 4px;font-size:14px;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em">Apoio às fases seguintes</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Agente</th><th>Fase</th><th>Acionamento</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Briefing de Aprovação</strong></td><td>Aprovação</td><td>Automático ao entrar na fila do aprovador — resumo de uma página com objeto, valor, riscos herdados do Revisor e desvios do modelo padrão</td></tr>
+              <tr><td><strong>Leitor de Marcos</strong></td><td>Contrato vigente</td><td>Automático ao virar vigente, e reacionável manualmente — propõe os marcos e prazos encontrados no texto para confirmação humana</td></tr>
+              <tr><td><strong>Gestor de Prazos</strong></td><td>Tratamento de prazo</td><td>Automático ao entrar na fila — recomenda a ação (renovar/renegociar/encerrar) com justificativa baseada no histórico</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tag-list">
+          <span class="tag">Execução assíncrona — o usuário nunca fica bloqueado esperando</span>
+          <span class="tag">Toda sugestão é revisável antes de valer</span>
+          <span class="tag">Registro em <code>ai_agent_runs</code>: quem acionou, qual modelo, o que foi aceito</span>
+          <span class="tag">Desativável por tenant, sem quebrar o restante do fluxo</span>
+        </div>
+      </div>
+
+      <div class="feature-block">
+        <div class="feature-header">
+          <div class="feature-num">12</div>
+          <div class="feature-title">SLA por Etapa e Dashboard</div>
+          <span class="badge badge-green" style="margin-left:auto">Visibilidade</span>
+        </div>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:12px">Cada etapa do ciclo de vida tem prazo máximo configurável. O admin do tenant vê gargalos e o dashboard responde "quantos contratos ativos, quanto valor comprometido, quem está travando o quê" sem relatório manual.</p>
+        <div class="tag-list">
+          <span class="tag">SLA configurável por etapa e categoria</span>
+          <span class="tag">Status: no prazo / atenção / vencido</span>
+          <span class="tag">Escalonamento automático</span>
+          <span class="tag">Dashboard com KPIs, exportação PDF</span>
+        </div>
+      </div>
+
+      <div class="feature-block">
+        <div class="feature-header">
+          <div class="feature-num">13</div>
+          <div class="feature-title">Billing e Gestão de Planos</div>
+          <span class="badge badge-red" style="margin-left:auto">Novo · Crítico</span>
+        </div>
+        <p style="font-size:14px;color:var(--gray);margin-bottom:12px">Sem cobrança recorrente automatizada não existe negócio de SaaS. Assinatura mensal configurada pelo time comercial no fechamento, ancorada em <strong>número de usuários ativos + nível de plano</strong> — sem medição de envelopes, o que simplifica bastante o billing do MVP. O admin do tenant acompanha quantos assentos está usando e solicita upgrade ao time comercial quando se aproxima do limite.</p>
+        <div class="tag-list">
+          <span class="tag">Assinatura criada pelo time comercial no fechamento (Stripe Brasil / Asaas)</span>
+          <span class="tag">Painel de usuários ativos vs. limite do plano</span>
+          <span class="tag">Alerta ao aproximar-se do limite de assentos</span>
+          <span class="tag">Solicitação de upgrade/downgrade encaminhada ao time comercial</span>
+          <span class="tag">Nota fiscal automática</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ STORIES -->
+    <section id="stories" class="section">
+      <div class="page-label">PRD — User Stories</div>
+      <h1>User Stories</h1>
+      <p class="lead">Histórias agrupadas por módulo, priorizando o que é novo em relação ao produto interno.</p>
+
+      <h2>Vendas, Implantação e Billing</h2>
+      <div class="story"><span class="story-role">Fernanda (Compradora)</span> Quero entender em uma conversa com o time comercial se o Pacta resolve o problema real da minha empresa para que eu não perca tempo avaliando uma ferramenta genérica sozinha.</div>
+      <div class="story"><span class="story-role">Fernanda (Compradora)</span> Quero ver uma demonstração com um pacote de partida próximo do meu setor para que eu entenda o valor antes de comprometer orçamento.</div>
+      <div class="story"><span class="story-role">Fernanda (Compradora)</span> Quero contar com o time da Pacta para migrar os contratos que já existem durante a implantação para que minha equipe não precise digitar tudo de novo sozinha.</div>
+      <div class="story"><span class="story-role">Ricardo (Admin do tenant)</span> Quero configurar categorias e alçadas junto com o time de implantação para que a configuração inicial reflita a política real da minha empresa, não um chute.</div>
+      <div class="story"><span class="story-role">Ricardo (Admin do tenant)</span> Quero conectar a conta de assinatura da minha própria empresa para que eu não pague pela assinatura duas vezes nem fique preso a um limite de envelopes do fornecedor do software.</div>
+      <div class="story"><span class="story-role">Ricardo (Admin do tenant)</span> Quero ver quantos usuários ativos tenho em relação ao limite do plano para que eu não seja surpreendido ao tentar convidar mais alguém.</div>
+      <div class="story"><span class="story-role">Ricardo (Admin do tenant)</span> Quero solicitar upgrade de plano rapidamente ao time comercial para que eu não trave a operação esperando um processo demorado.</div>
+
+      <h2>Solicitação de Contrato</h2>
+      <div class="story"><span class="story-role">Bruno (Solicitante)</span> Quero abrir uma solicitação de contrato sem precisar saber qual modelo usar para que eu não trave meu pedido por não entender a parte jurídica.</div>
+      <div class="story"><span class="story-role">Bruno (Solicitante)</span> Quero anexar a minuta que o fornecedor me mandou junto da solicitação para que o Jurídico analise o documento dele em vez de eu ter que explicar por e-mail.</div>
+      <div class="story"><span class="story-role">Bruno (Solicitante)</span> Quero anexar a proposta comercial que já fechei para que o contrato reflita exatamente o que foi negociado.</div>
+      <div class="story"><span class="story-role">Bruno (Solicitante)</span> Quero escolher um modelo da lista quando eu souber qual serve para que casos simples e repetitivos não precisem de análise do zero.</div>
+      <div class="story"><span class="story-role">Bruno (Solicitante)</span> Quero acompanhar o status da minha solicitação sem perguntar para ninguém para que eu consiga dar previsão ao fornecedor.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero uma fila só de solicitações aguardando triagem para que nada fique parado sem eu perceber.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero trocar o modelo que o solicitante sugeriu quando ele escolher errado para que a decisão jurídica seja sempre minha, não dele.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero acionar o Extrator na minuta de terceiro anexada para que eu receba as partes, valores e prazos já organizados em vez de ler o PDF inteiro.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero acionar o Revisor Jurídico sobre o documento da contraparte para que eu veja de imediato quais cláusulas fogem do nosso padrão.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero acionar o Redator para gerar a minuta a partir do modelo e dos dados da solicitação para que eu parta de um rascunho pronto em vez da página em branco.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero decidir quais agentes usar em cada caso, sem que nenhum rode automaticamente, para que eu não gaste análise de IA em contrato simples nem perca o controle do que foi consultado.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero pedir um esclarecimento ao solicitante pelo chat, sem recusar o pedido, para que a solicitação não volte à estaca zero por uma dúvida pequena.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero recusar uma solicitação pedindo mais informação para que ela não vire contrato antes de estar clara.</div>
+      <div class="story"><span class="story-role">Patrícia (Gestora de Contratos)</span> Quero ver o tempo médio entre a abertura da solicitação e a triagem para que eu identifique se o Jurídico está virando gargalo na entrada.</div>
+
+      <h2>Categorias e Templates</h2>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero criar minhas próprias categorias de contrato para que a ferramenta reflita exatamente como minha empresa organiza os documentos.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero fazer upload de um .docx com marcadores <code>${campo}</code> e ter o template criado automaticamente para que eu não precise redigitar o contrato no editor.</div>
+      <div class="story"><span class="story-role">Bruno (Negócio)</span> Quero preencher um formulário com os dados da contraparte para que o sistema gere a minuta pronta em minutos, sem escolher template manualmente.</div>
+
+      <h2>Negociação da Minuta</h2>
+      <div class="story"><span class="story-role">Contraparte externa</span> Quero comentar ou anexar uma versão ajustada da minuta sem precisar criar conta para que o Jurídico veja meu ajuste sem eu precisar mandar e-mail separado.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero comparar a versão ajustada da contraparte com a original antes de aceitar para que eu não incorpore uma mudança sem revisar.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero ver o histórico completo de rodadas de negociação no dossiê do contrato para que o registro fique completo em caso de disputa futura.</div>
+
+      <h2>Aprovação e Assinatura</h2>
+      <div class="story"><span class="story-role">Ricardo (Admin do tenant)</span> Quero configurar alçadas por valor e categoria conforme a política da minha empresa para que a aprovação reflita a governança real, não um padrão genérico.</div>
+      <div class="story"><span class="story-role">Ricardo (Admin do tenant)</span> Quero que contratos de baixo valor com template pré-aprovado sigam direto para assinatura sem aprovação manual para que o jurídico não vire gargalo em contratos de baixo risco.</div>
+      <div class="story"><span class="story-role">Contraparte externa</span> Quero abrir o link no celular e assinar em menos de 2 minutos, sem criar conta, para que eu não abandone o processo por fricção.</div>
+
+      <h2>Prazos, SLA e Contrapartes</h2>
+      <div class="story"><span class="story-role">Patrícia (Gestora de Contratos)</span> Quero ver todos os contratos com prazo nos próximos 90 dias e o status de tratamento de cada um para que nenhum vença sem uma decisão registrada.</div>
+      <div class="story"><span class="story-role">Patrícia (Gestora de Contratos)</span> Quero cobrar um responsável por uma etapa atrasada direto pelo sistema para que eu não dependa de e-mail paralelo.</div>
+      <div class="story"><span class="story-role">Patrícia (Gestora de Contratos)</span> Quero configurar SLAs diferentes por categoria de contrato para que as expectativas sejam realistas para cada situação.</div>
+      <div class="story"><span class="story-role">Patrícia (Gestora de Contratos)</span> Quero gerar um relatório periódico de performance de SLA para a diretoria para que eu não monte isso manualmente toda semana.</div>
+      <div class="story"><span class="story-role">Bruno (Negócio)</span> Quero receber um único e-mail por dia com todos os meus prazos, em vez de um e-mail por prazo, para que eu não comece a ignorar as notificações do sistema.</div>
+      <div class="story"><span class="story-role">Bruno (Negócio)</span> Quero que o resumo diário mostre primeiro o que é crítico para que eu saiba onde agir sem ler a lista inteira.</div>
+      <div class="story"><span class="story-role">Bruno (Negócio)</span> Não quero receber e-mail nenhum nos dias em que não há nada pendente para mim, para que a chegada do resumo já signifique que existe algo a fazer.</div>
+      <div class="story"><span class="story-role">Bruno (Negócio)</span> Quero receber alerta 30 dias antes do fim de um contrato de fornecimento para que eu inicie a renegociação com antecedência.</div>
+      <div class="story"><span class="story-role">Patrícia (Gestora de Contratos)</span> Quero definir o horário em que o resumo diário é enviado para que ele chegue no início do expediente da minha equipe.</div>
+      <div class="story"><span class="story-role">Patrícia (Gestora de Contratos)</span> Quero conseguir provar que um prazo específico foi avisado, com data e destinatário, mesmo que o aviso tenha ido dentro de um resumo, para que eu responda a uma auditoria sem depender da caixa de e-mail de alguém.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero cadastrar um fornecedor uma vez e reaproveitar em todos os contratos com ele para que eu não redigite os mesmos dados.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero cadastrar a validade de uma certidão com renovação recorrente para que eu seja avisada antes de vencer, não depois.</div>
+
+      <h2>Aditivos e Renovações</h2>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero criar um aditivo direto da tela do contrato original para que ele já nasça vinculado, sem risco de esquecer o link depois.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero registrar a justificativa do aditivo para que quem aprovar entenda o motivo sem precisar me perguntar.</div>
+      <div class="story"><span class="story-role">Patrícia (Gestora de Contratos)</span> Quero que a nova data de vigência do aditivo assinado substitua automaticamente a do contrato original para que a fila de prazos passe a monitorar a data certa.</div>
+      <div class="story"><span class="story-role">Patrícia (Gestora de Contratos)</span> Quero ver toda a cadeia de aditivos de um contrato em um lugar só para que eu entenda o histórico de valor e prazo sem abrir documento por documento.</div>
+
+      <h2>Chat do Contrato</h2>
+      <div class="story"><span class="story-role">Bruno (Solicitante)</span> Quero deixar registrado no contrato o que combinei com o fornecedor por telefone para que a informação não fique só na minha memória.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero ler a conversa que aconteceu na solicitação depois que ela virou contrato para que eu não perca o contexto do pedido original.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero que a conversa interna sobre limite de negociação jamais seja visível à contraparte para que a estratégia da empresa não vaze pelo link de negociação.</div>
+      <div class="story"><span class="story-role">Patrícia (Gestora de Contratos)</span> Quero mencionar uma pessoa no chat do contrato para que ela veja a solicitação no resumo diário dela.</div>
+      <div class="story"><span class="story-role">Patrícia (Gestora de Contratos)</span> Quero ver eventos do sistema (aprovado, assinado, aditivado) na mesma linha do tempo das mensagens para que eu entenda a história completa do contrato numa leitura só.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero que ninguém possa editar ou apagar mensagem já postada para que o histórico sirva de prova em auditoria.</div>
+
+      <h2>Agentes de IA — Demais Fases</h2>
+      <div class="story"><span class="story-role">Marcelo (Aprovador)</span> Quero receber um briefing de uma página quando o contrato chega para minha aprovação para que eu decida com contexto sem ler o documento inteiro.</div>
+      <div class="story"><span class="story-role">Ricardo (Admin do tenant)</span> Quero fazer upload de contratos legados em PDF e receber os dados extraídos automaticamente para que a migração para o Pacta não seja um trabalho manual exaustivo.</div>
+      <div class="story"><span class="story-role">Camila (Jurídico)</span> Quero chamar o Leitor de Marcos em qualquer contrato assinado e receber a lista de prazos identificados para que eu configure alertas em minutos.</div>
+      <div class="story"><span class="story-role">Patrícia (Gestora de Contratos)</span> Quero que o Gestor de Prazos me entregue uma recomendação de ação quando o prazo entra na fila para que eu não parta do zero a cada análise.</div>
+
+      <h2>Plataforma (Time Pacta)</h2>
+      <div class="story"><span class="story-role">Suporte Pacta</span> Quero ver o status de provisionamento e saúde de cada tenant em um painel único para que eu detecte problemas antes do cliente reclamar.</div>
+      <div class="story"><span class="story-role">Suporte Pacta</span> Quero acessar um tenant específico só com permissão auditada e temporária para que eu resolva um chamado sem violar a confiança do cliente sobre seus dados.</div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ UX -->
+    <section id="ux" class="section">
+      <div class="page-label">PRD — UX &amp; Design</div>
+      <h1>UX &amp; Design</h1>
+      <p class="lead">O princípio central herdado do produto interno continua: simplicidade acima de tudo. O que muda é que agora o produto precisa se apresentar sozinho — sem alguém do time treinando o usuário presencialmente.</p>
+
+      <div class="callout">
+        <p><strong>Princípio central:</strong> Se o usuário do plano Starter precisar ler documentação para criar seu primeiro contrato, a tela está errada. Onboarding e uso do dia a dia devem ser autoexplicativos.</p>
+      </div>
+
+      <h2>Identidade Visual Proposta — Marca Pacta</h2>
+      <p style="font-size:14px;color:var(--gray)">Marca nova e independente, como decidido para o produto comercial. Proposta de paleta para o produto (distinta do template visual deste documento, que segue um padrão interno de documentação):</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Token</th><th>Valor</th><th>Uso</th></tr></thead>
+          <tbody>
+            <tr><td>Primária</td><td><div class="swatch-row"><span class="swatch" style="background:#4F46E5"></span><code>#4F46E5</code></div></td><td>CTAs, links ativos, badges de status — transmite confiança/tecnologia, sem herdar a paleta laranja de um setor específico</td></tr>
+            <tr><td>Tinta (texto/superfícies escuras)</td><td><div class="swatch-row"><span class="swatch" style="background:#0F172A"></span><code>#0F172A</code></div></td><td>Topbar, headings</td></tr>
+            <tr><td>Ardósia (texto secundário)</td><td><div class="swatch-row"><span class="swatch" style="background:#64748B"></span><code>#64748B</code></div></td><td>Corpo de texto, metadados</td></tr>
+            <tr><td>Névoa (bordas/fundos)</td><td><div class="swatch-row"><span class="swatch" style="background:#E2E8F0"></span><code>#E2E8F0</code></div></td><td>Cards, divisores, tabelas</td></tr>
+            <tr><td>Sucesso</td><td><div class="swatch-row"><span class="swatch" style="background:#10B981"></span><code>#10B981</code></div></td><td>Contrato vigente, SLA no prazo</td></tr>
+            <tr><td>Fonte</td><td>Inter</td><td>Consistência com legibilidade em telas de formulário densas</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Princípios de Design</h2>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">🚀</div>
+          <div class="card-title">Onboarding é a primeira feature</div>
+          <div class="card-desc">O pacote de setor não é decoração — é o que faz a diferença entre um tenant abandonado no dia 1 e um tenant ativado.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🎯</div>
+          <div class="card-title">Status visível sem clicar</div>
+          <div class="card-desc">Status do contrato e do SLA sempre visíveis na lista, nunca escondidos atrás de um clique.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🗣️</div>
+          <div class="card-title">Terminologia adaptável</div>
+          <div class="card-desc">Labels de campo seguem a categoria do tenant — "locatário" para imobiliário, "cliente" para serviços, sem hardcode de vocabulário de um setor só.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <div class="card-title">Zero cliques desnecessários</div>
+          <div class="card-desc">Criar contrato: selecionar categoria → preencher formulário → confirmar. Máximo 3 passos.</div>
+        </div>
+      </div>
+
+      <h2>Telas Principais</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tela</th><th>Persona principal</th><th>Ação primária</th></tr></thead>
+          <tbody>
+            <tr><td>Onboarding / Escolha de Pacote</td><td>Fernanda, Ricardo</td><td>Criar tenant e escolher pacote de setor</td></tr>
+            <tr><td>Dashboard</td><td>Ricardo, Camila</td><td>Ver KPIs, vencimentos e consumo do plano</td></tr>
+            <tr><td>Nova Solicitação</td><td>Bruno</td><td>Descrever a necessidade, escolher modelo (opcional) ou anexar minuta/proposta</td></tr>
+            <tr><td>Minhas Solicitações</td><td>Bruno</td><td>Acompanhar status sem cobrar ninguém</td></tr>
+            <tr><td>Fila de Análise de Solicitações</td><td>Camila, Patrícia</td><td>Ver o que aguarda análise, priorizado por data desejada e tempo na fila</td></tr>
+            <tr><td>Análise da Solicitação</td><td>Camila</td><td>Ler o pedido e os anexos, acionar Extrator/Revisor/Redator, produzir a minuta e converter — ou recusar</td></tr>
+            <tr><td>Lista de Contratos</td><td>Camila, Bruno</td><td>Filtrar e encontrar qualquer contrato em segundos</td></tr>
+            <tr><td>Detalhe do Contrato — aba Conversas</td><td>Todos com acesso</td><td>Ler a linha do tempo (mensagens + eventos) e postar no chat interno</td></tr>
+            <tr><td>Detalhe do Contrato — aba Negociação</td><td>Camila</td><td>Ver ajustes da contraparte e decidir aceitar ou recusar</td></tr>
+            <tr><td>Novo Contrato (formulário)</td><td>Camila</td><td>Preencher dados e gerar minuta — caminho direto, sem Solicitação</td></tr>
+            <tr><td>Configuração de Categorias</td><td>Ricardo, Camila</td><td>Criar/editar categorias, campos e alçadas</td></tr>
+            <tr><td>Assinatura (pública)</td><td>Contraparte externa</td><td>Ler e assinar — mobile-first, sem login</td></tr>
+            <tr><td>Faturamento</td><td>Ricardo</td><td>Ver consumo, fazer upgrade, baixar notas fiscais</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ NFR -->
+    <section id="nfr" class="section">
+      <div class="page-label">PRD — Não Funcionais</div>
+      <h1>Requisitos Não Funcionais</h1>
+
+      <h2>Performance</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Cenário</th><th>Alvo</th></tr></thead>
+          <tbody>
+            <tr><td>Carregamento da lista de contratos (100 itens)</td><td>&lt; 1,5s</td></tr>
+            <tr><td>Geração de contrato a partir de template</td><td>&lt; 4s</td></tr>
+            <tr><td>Provisionamento de novo tenant (schema + seed do pacote)</td><td>&lt; 60s</td></tr>
+            <tr><td>Troca de <code>search_path</code> por requisição (overhead multi-tenant)</td><td>&lt; 15ms</td></tr>
+            <tr><td>Exportação de relatório (200 contratos)</td><td>&lt; 8s</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Segurança, Multi-Tenancy e LGPD</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Requisito</th><th>Detalhe</th></tr></thead>
+          <tbody>
+            <tr><td>Isolamento de dados</td><td>Schema-per-tenant no PostgreSQL — nenhuma query cross-tenant possível por engano; conexão de aplicação troca <code>search_path</code> por requisição, resolvido pelo subdomínio</td></tr>
+            <tr><td>Auditoria de acesso da equipe Pacta</td><td>Acesso de suporte a dados de um tenant exige justificativa registrada e expira automaticamente em 4h ("break-glass" auditável)</td></tr>
+            <tr><td>Autenticação</td><td>E-mail/senha com política de complexidade + SSO Google/Microsoft Workspace (plano Enterprise)</td></tr>
+            <tr><td>Autorização</td><td>RBAC por tenant — usuário nunca enxerga schema de outro tenant, mesmo com o mesmo e-mail cadastrado em ambos</td></tr>
+            <tr><td>Signatários externos</td><td>Token único por link, expira em 72h, sem necessidade de conta</td></tr>
+            <tr><td>Criptografia</td><td>TLS 1.3 em trânsito; documentos criptografados em repouso no storage, prefixados por tenant</td></tr>
+            <tr><td>Credenciais de integração do cliente</td><td>Chaves de API do provedor de assinatura e do WhatsApp cifradas em repouso em <code>tenant_integrations</code>, nunca retornadas por nenhum endpoint e nunca gravadas em log — inclusive para o staff Pacta, que pode reconfigurar mas não ler</td></tr>
+            <tr><td>Dados enviados ao provedor de IA</td><td>Texto de contrato é enviado à OpenAI API para análise. Uso de conta corporativa com retenção zero para treinamento; o cliente é informado no DPA e o envio pode ser desativado por tenant, desligando os agentes</td></tr>
+            <tr><td>Integridade</td><td>Hash SHA-256 calculado no upload e verificável a qualquer momento</td></tr>
+            <tr><td>LGPD</td><td>Data residency no Brasil, DPA padrão para todos os planos, exportação e exclusão de dados do tenant sob solicitação (right to be forgotten a nível de tenant inteiro na saída do cliente)</td></tr>
+            <tr><td>Backup</td><td>Diário automático por schema, retenção 90 dias (Enterprise: retenção customizável)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Disponibilidade</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Requisito</th><th>Alvo</th></tr></thead>
+          <tbody>
+            <tr><td>Uptime mensal — Starter/Growth</td><td>99,5%</td></tr>
+            <tr><td>Uptime mensal — Enterprise</td><td>99,9%, com status page pública</td></tr>
+            <tr><td>RPO</td><td>24h (Enterprise: 1h)</td></tr>
+            <tr><td>RTO</td><td>4h</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Compatibilidade</h2>
+      <div class="tag-list">
+        <span class="tag">Chrome 120+</span>
+        <span class="tag">Edge 120+</span>
+        <span class="tag">Firefox 120+</span>
+        <span class="tag">Safari 17+</span>
+        <span class="tag">iOS Safari 16+ (assinatura)</span>
+        <span class="tag">Android Chrome 120+ (assinatura)</span>
+        <span class="tag">Upload máx. 50 MB por arquivo</span>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ ARCH -->
+    <section id="arch" class="section">
+      <div class="page-label">SPECS — Arquitetura</div>
+      <h1>Arquitetura</h1>
+      <p class="lead">Reaproveita o stack já operando internamente (Next.js + FastAPI + PostgreSQL/Supabase + ClickSign), com três mudanças: <strong>schema-per-tenant</strong> substitui o isolamento por <code>company_id</code> em tabela compartilhada, os agentes passam a rodar sobre a <strong>OpenAI API (GPT-4.1)</strong> e o canal de WhatsApp migra para a <strong>Evolution API 2.3.7</strong> auto-hospedada.</p>
+
+      <div class="callout">
+        <p><strong>Por que schema-per-tenant e não <code>tenant_id</code> compartilhado:</strong> isolamento físico dentro do mesmo banco elimina uma classe inteira de bug (query sem filtro de tenant vazando dado de outro cliente) e é um argumento de venda concreto para compradores como a Fernanda, preocupados com confidencialidade de contratos. O custo é operacional — migrations e provisionamento precisam de automação dedicada, não é "grátis" como o modelo compartilhado.</p>
+      </div>
+
+      <div class="arch-grid">
+        <div class="arch-box">
+          <div class="arch-layer">Frontend</div>
+          <div class="arch-tech">Next.js (App Router) + TypeScript</div>
+          <div class="arch-desc">Mesmo stack do produto interno. Resolução de tenant por subdomínio (<code>{slug}.pacta.com.br</code>), com middleware que injeta o schema resolvido em todas as chamadas de API.</div>
+        </div>
+        <div class="arch-box">
+          <div class="arch-layer">Backend</div>
+          <div class="arch-tech">Python + FastAPI</div>
+          <div class="arch-desc">SQLAlchemy async + Alembic + Pydantic v2. Middleware de tenant resolve o subdomínio → schema e define <code>search_path</code> por requisição antes de qualquer query.</div>
+        </div>
+        <div class="arch-box">
+          <div class="arch-layer">Banco de Dados</div>
+          <div class="arch-tech">PostgreSQL 16 (Supabase) — schema-per-tenant</div>
+          <div class="arch-desc">Schema <code>public</code> guarda o catálogo de plataforma (tenants, planos, assinaturas, identidade global). Cada tenant ganha um schema <code>tenant_{slug}</code> com contratos, templates, categorias etc. Migrations rodam em loop sobre todos os schemas ativos.</div>
+        </div>
+        <div class="arch-box">
+          <div class="arch-layer">Provisionamento de Tenant</div>
+          <div class="arch-tech">Serviço dedicado — <code>tenant_provisioning</code></div>
+          <div class="arch-desc">Disparado pelo time de implantação via console interno após o fechamento comercial (não por signup público): cria registro em <code>public.tenants</code>, cria schema Postgres, roda Alembic contra o schema novo, faz seed do pacote de setor escolhido (categorias + templates de exemplo). Idempotente e reexecutável em caso de falha parcial.</div>
+        </div>
+        <div class="arch-box">
+          <div class="arch-layer">Autenticação e Identidade</div>
+          <div class="arch-tech">Identidade central (schema <code>public</code>) + SSO opcional</div>
+          <div class="arch-desc">Um usuário de e-mail único pode pertencer a múltiplos tenants (ex.: consultor jurídico que atende duas empresas clientes) — tabela <code>tenant_memberships</code> resolve o vínculo. SSO Google/Microsoft Workspace por tenant no plano Enterprise.</div>
+        </div>
+        <div class="arch-box">
+          <div class="arch-layer">Storage de Documentos</div>
+          <div class="arch-tech">Supabase Storage, prefixado por tenant</div>
+          <div class="arch-desc">Caminho <code>{tenant_slug}/{tipo}/{uuid}.pdf</code>. Enterprise pode solicitar bucket dedicado para requisitos de residência de dados mais estritos.</div>
+        </div>
+        <div class="arch-box">
+          <div class="arch-layer">Assinatura Eletrônica</div>
+          <div class="arch-tech">SignatureProvider · ClickSign API 3.0</div>
+          <div class="arch-desc">Mesma abstração do produto interno. As credenciais ficam <strong>por tenant</strong> (guardadas cifradas em <code>public.tenant_integrations</code>) — cada empresa emite envelopes na própria conta ClickSign. Uma conta mestre da Pacta existe apenas para clientes que contratam o add-on de conta gerenciada.</div>
+        </div>
+        <div class="arch-box">
+          <div class="arch-layer">IA — Agentes</div>
+          <div class="arch-tech">OpenAI API — GPT-4.1</div>
+          <div class="arch-desc">Mesmos 6 agentes do produto interno, prompts reescritos para ler a categoria de contrato do tenant em vez de presumir contexto imobiliário. GPT-4.1 para análise jurídica, revisão e briefing; GPT-4.1 mini para validações em tempo real e pré-preenchimento (baixa latência). Respostas estruturadas via <em>structured outputs</em> + Pydantic. Resultados em <code>ai_agent_runs</code> por schema de tenant.</div>
+        </div>
+        <div class="arch-box">
+          <div class="arch-layer">Billing</div>
+          <div class="arch-tech">Stripe Brasil ou Asaas</div>
+          <div class="arch-desc">Assinatura recorrente por plano, com limite de assentos verificado na aplicação — sem medição de consumo por envelope. Webhooks atualizam <code>public.subscriptions</code> e status de acesso do tenant.</div>
+        </div>
+        <div class="arch-box">
+          <div class="arch-layer">Notificações</div>
+          <div class="arch-tech">Celery + Redis + Resend + Evolution API 2.3.7</div>
+          <div class="arch-desc">Jobs por tenant, isolados por schema, broker Redis compartilhado com namespace por tenant. <strong>Um único job de digest por tenant/dia</strong> agrupa os <code>notification_items</code> pendentes por destinatário e envia um e-mail por pessoa via Resend. <strong>Evolution API 2.3.7</strong> auto-hospedada cobre WhatsApp — substitui a Z-API do produto interno: sem custo por mensagem de terceiro e sem gateway externo, ao custo de operar a instância (Docker) e gerenciar a sessão do número.</div>
+        </div>
+        <div class="arch-box">
+          <div class="arch-layer">Motor de Prazos</div>
+          <div class="arch-tech">Celery Beat — job diário por tenant</div>
+          <div class="arch-desc">Varre <code>contract_milestones</code> por <code>next_alert_at &lt;= now()</code>, gera <code>notification_items</code> pendentes (não envia nada direto), recalcula o próximo disparo e abre <code>deadline_treatments</code> para marcos de criticidade alta. Um segundo passo verifica <code>internal_deadline</code> vencido e escalona, também via item pendente.</div>
+        </div>
+        <div class="arch-box">
+          <div class="arch-layer">Infraestrutura</div>
+          <div class="arch-tech">Railway/Fly.io + Supabase + Vercel</div>
+          <div class="arch-desc">Zero ops de servidor dedicado, exceto a instância Docker da Evolution API. Wildcard DNS (<code>*.pacta.com.br</code>) + roteamento por subdomínio na borda.</div>
+        </div>
+      </div>
+
+      <h2>Estrutura de Módulos — Backend</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Módulo</th><th>Responsabilidade</th></tr></thead>
+          <tbody>
+            <tr><td><code>app/platform/tenants/</code></td><td>CRUD de tenants, provisionamento de schema, seed de pacote de setor</td></tr>
+            <tr><td><code>app/platform/billing/</code></td><td>Planos, assinaturas, validação de <code>seat_limit</code>, webhooks de gateway de pagamento</td></tr>
+            <tr><td><code>app/platform/integrations/</code></td><td>Credenciais de assinatura e WhatsApp por tenant, cifragem em repouso, teste de conectividade</td></tr>
+            <tr><td><code>app/tenant/requests/</code></td><td>Solicitações, anexos, fila de triagem, conversão em contrato e recusa</td></tr>
+            <tr><td><code>app/tenant/contracts/</code></td><td>CRUD de contratos, ciclo de vida (roda dentro do schema do tenant resolvido)</td></tr>
+            <tr><td><code>app/tenant/categories/</code></td><td>Categorias de contrato configuráveis, campos padrão</td></tr>
+            <tr><td><code>app/tenant/templates/</code></td><td>Templates, variáveis dinâmicas, geração de minuta + PDF</td></tr>
+            <tr><td><code>app/tenant/signatures/</code></td><td>Tokens de assinatura, SignatureProvider, hash</td></tr>
+            <tr><td><code>app/tenant/approvals/</code></td><td>Alçadas, workflow de aprovação</td></tr>
+            <tr><td><code>app/tenant/counterparties/</code></td><td>Contrapartes e documentos de compliance</td></tr>
+            <tr><td><code>app/tenant/deadlines/</code></td><td>Marcos, cálculo de datas de alerta, fila de tratamento, escalonamento</td></tr>
+            <tr><td><code>app/tenant/addenda/</code></td><td>Aditivos, numeração sequencial, propagação de vigência/valor ao contrato pai</td></tr>
+            <tr><td><code>app/tenant/messages/</code></td><td>Chat interno de contrato e solicitação, eventos de sistema na linha do tempo, menções — sem nenhuma rota pública</td></tr>
+            <tr><td><code>app/tenant/negotiation/</code></td><td>Thread externa por token e decisão sobre ajustes da contraparte</td></tr>
+            <tr><td><code>app/tenant/ai_agents/</code></td><td>Os 6 agentes sobre OpenAI GPT-4.1, prompts versionados, chamadas assíncronas</td></tr>
+            <tr><td><code>app/tenant/notifications/</code></td><td>Geração de <code>notification_items</code>, consolidação no digest diário, envio (Resend / Evolution API), reprocessamento de falhas</td></tr>
+            <tr><td><code>app/middleware/tenant_resolver.py</code></td><td>Resolve subdomínio → schema, define <code>search_path</code> por requisição</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ MODELS -->
+    <section id="models" class="section">
+      <div class="page-label">SPECS — Dados</div>
+      <h1>Modelos de Dados</h1>
+      <p class="lead">Dois grupos: modelos de <strong>plataforma</strong> (schema <code>public</code>, cross-tenant) e modelos de <strong>tenant</strong> (replicados em cada schema <code>tenant_{slug}</code>). Todos os modelos de tenant têm <code>created_at</code>, <code>updated_at</code>, <code>deleted_at</code> (soft delete).</p>
+
+      <h2>Schema <code>public</code> — Plataforma</h2>
+
+      <div class="model-block">
+        <div class="model-name">🏢 tenants</div>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">slug</div><div class="field-type">VARCHAR(63) UNIQUE</div><div class="field-desc">Subdomínio e nome do schema (<code>tenant_{slug}</code>)</div></div>
+          <div class="field-row"><div class="field-name">name</div><div class="field-type">VARCHAR(255)</div><div class="field-desc">Nome da empresa cliente</div></div>
+          <div class="field-row"><div class="field-name">sector_pack</div><div class="field-type">ENUM</div><div class="field-desc">generico | juridico_servicos | compras_fornecedores | rh_pessoas | comercial | imobiliario</div></div>
+          <div class="field-row"><div class="field-name">status</div><div class="field-type">ENUM</div><div class="field-desc">provisionando | ativo | trial | suspenso | cancelado</div></div>
+          <div class="field-row"><div class="field-name">provisioned_at</div><div class="field-type">TIMESTAMPTZ NULL</div><div class="field-desc">Quando o schema terminou de ser criado</div></div>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">💳 plans</div>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">code</div><div class="field-type">ENUM</div><div class="field-desc">starter | growth | enterprise</div></div>
+          <div class="field-row"><div class="field-name">price_cents</div><div class="field-type">INTEGER</div><div class="field-desc">Preço mensal em centavos</div></div>
+          <div class="field-row"><div class="field-name">seat_limit</div><div class="field-type">INTEGER NULL</div><div class="field-desc">Limite de usuários (null = ilimitado)</div></div>
+          <div class="field-row"><div class="field-name">features</div><div class="field-type">JSONB</div><div class="field-desc">Flags de feature (SSO, agentes de IA, negociação de minuta, schema dedicado)</div></div>
+        </div>
+      </div>
+      <div class="callout info" style="margin-top:-8px">
+        <p>Não existem <code>envelope_limit</code> nem <code>overage_price_cents</code>: como cada tenant assina na própria conta do provedor, não há consumo a medir nem excedente a cobrar. O único limite quantitativo do plano é <code>seat_limit</code>, verificado no convite de usuário.</p>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">🔌 tenant_integrations <span class="badge badge-red">novo</span></div>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">tenant_id</div><div class="field-type">UUID FK</div><div class="field-desc">Tenant proprietário da integração</div></div>
+          <div class="field-row"><div class="field-name">provider</div><div class="field-type">ENUM</div><div class="field-desc">clicksign | docusign | evolution_whatsapp</div></div>
+          <div class="field-row"><div class="field-name">credentials</div><div class="field-type">BYTEA</div><div class="field-desc">Credenciais do cliente cifradas em repouso — nunca retornadas pela API, só usadas server-side</div></div>
+          <div class="field-row"><div class="field-name">is_managed_by_pacta</div><div class="field-type">BOOLEAN</div><div class="field-desc">true = add-on de conta gerenciada (exceção contratada); false = conta própria do cliente (padrão)</div></div>
+          <div class="field-row"><div class="field-name">configured_by</div><div class="field-type">UUID FK</div><div class="field-desc">Quem configurou (normalmente staff de implantação)</div></div>
+          <div class="field-row"><div class="field-name">last_verified_at</div><div class="field-type">TIMESTAMPTZ NULL</div><div class="field-desc">Último teste de conectividade bem-sucedido com o provedor</div></div>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">🧾 subscriptions</div>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">tenant_id</div><div class="field-type">UUID FK</div><div class="field-desc">Tenant assinante</div></div>
+          <div class="field-row"><div class="field-name">plan_id</div><div class="field-type">UUID FK</div><div class="field-desc">Plano ativo</div></div>
+          <div class="field-row"><div class="field-name">gateway_subscription_id</div><div class="field-type">VARCHAR(255)</div><div class="field-desc">ID no Stripe/Asaas</div></div>
+          <div class="field-row"><div class="field-name">status</div><div class="field-type">ENUM</div><div class="field-desc">trialing | active | past_due | canceled</div></div>
+          <div class="field-row"><div class="field-name">current_period_end</div><div class="field-type">TIMESTAMPTZ</div><div class="field-desc">Fim do ciclo de cobrança atual</div></div>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">👤 platform_users / tenant_memberships</div>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">platform_users.id</div><div class="field-type">UUID PK</div><div class="field-desc">Identidade global por e-mail</div></div>
+          <div class="field-row"><div class="field-name">tenant_memberships.tenant_id</div><div class="field-type">UUID FK</div><div class="field-desc">Tenant do vínculo</div></div>
+          <div class="field-row"><div class="field-name">tenant_memberships.user_id</div><div class="field-type">UUID FK</div><div class="field-desc">Usuário vinculado</div></div>
+          <div class="field-row"><div class="field-name">tenant_memberships.role</div><div class="field-type">ENUM</div><div class="field-desc">admin | juridico | aprovador | gestor_contratos | visualizador</div></div>
+        </div>
+      </div>
+
+      <h2>Schema <code>tenant_{slug}</code> — Aplicação</h2>
+
+      <div class="model-block">
+        <div class="model-name">🏷️ contract_categories <span class="badge badge-red">novo</span></div>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">name</div><div class="field-type">VARCHAR(100)</div><div class="field-desc">Nome livre definido pelo tenant (ex: "Locação Comercial", "Contrato de Consultoria")</div></div>
+          <div class="field-row"><div class="field-name">code</div><div class="field-type">VARCHAR(50)</div><div class="field-desc">Slug interno para referência em templates/regras</div></div>
+          <div class="field-row"><div class="field-name">default_fields</div><div class="field-type">JSONB</div><div class="field-desc">Campos padrão sugeridos: [{name, label, type, required}]</div></div>
+          <div class="field-row"><div class="field-name">icon</div><div class="field-type">VARCHAR(50) NULL</div><div class="field-desc">Ícone de organização visual</div></div>
+          <div class="field-row"><div class="field-name">source_pack</div><div class="field-type">VARCHAR(50) NULL</div><div class="field-desc">Pacote de setor que originou a categoria (null = criada manualmente)</div></div>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">📥 contract_requests <span class="badge badge-red">novo</span></div>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:10px">Ponto de entrada do ciclo. Vive separado de <code>contracts</code> de propósito: uma Solicitação recusada nunca deve poluir o repositório de contratos, e o histórico de pedidos tem valor próprio (o que foi pedido, quanto demorou para ser triado, quanto foi recusado).</p>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">request_number</div><div class="field-type">SERIAL</div><div class="field-desc">Número sequencial legível, para o solicitante referenciar ("Solicitação #142")</div></div>
+          <div class="field-row"><div class="field-name">requester_id</div><div class="field-type">UUID FK</div><div class="field-desc">Colaborador que abriu — normalmente papel <code>visualizador</code></div></div>
+          <div class="field-row"><div class="field-name">department_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Área que originou o pedido</div></div>
+          <div class="field-row"><div class="field-name">title</div><div class="field-type">VARCHAR(255)</div><div class="field-desc">Resumo do que se precisa</div></div>
+          <div class="field-row"><div class="field-name">description</div><div class="field-type">TEXT</div><div class="field-desc">Descrição livre da necessidade, em linguagem de negócio</div></div>
+          <div class="field-row"><div class="field-name">origin</div><div class="field-type">ENUM</div><div class="field-desc">modelo_interno | minuta_terceiro | sem_documento — determina o caminho da triagem</div></div>
+          <div class="field-row"><div class="field-name">suggested_template_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Modelo escolhido pelo solicitante — <strong>sugestão</strong>, o Jurídico pode trocar</div></div>
+          <div class="field-row"><div class="field-name">category_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Categoria pretendida, quando o solicitante sabe indicar</div></div>
+          <div class="field-row"><div class="field-name">counterparty_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Contraparte já cadastrada, se houver</div></div>
+          <div class="field-row"><div class="field-name">counterparty_raw</div><div class="field-type">VARCHAR(255) NULL</div><div class="field-desc">Nome digitado livremente quando a contraparte ainda não existe no cadastro</div></div>
+          <div class="field-row"><div class="field-name">estimated_value</div><div class="field-type">DECIMAL(15,2) NULL</div><div class="field-desc">Valor estimado — usado para prever a alçada de aprovação já na triagem</div></div>
+          <div class="field-row"><div class="field-name">desired_date</div><div class="field-type">DATE NULL</div><div class="field-desc">Quando o solicitante precisa do contrato pronto — insumo de priorização da fila</div></div>
+          <div class="field-row"><div class="field-name">status</div><div class="field-type">ENUM</div><div class="field-desc">aberta | em_triagem | convertida | recusada | cancelada</div></div>
+          <div class="field-row"><div class="field-name">triaged_by</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Quem triou</div></div>
+          <div class="field-row"><div class="field-name">triaged_at</div><div class="field-type">TIMESTAMPTZ NULL</div><div class="field-desc">Quando foi triada — base do SLA de triagem</div></div>
+          <div class="field-row"><div class="field-name">rejection_reason</div><div class="field-type">TEXT NULL</div><div class="field-desc">Motivo da recusa ou informação faltante solicitada</div></div>
+          <div class="field-row"><div class="field-name">converted_contract_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Contrato gerado a partir desta Solicitação</div></div>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">📎 request_attachments <span class="badge badge-red">novo</span></div>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:10px">O que o solicitante já tem em mãos. Tabela própria, não JSONB, porque cada anexo pode virar insumo do Agente Extrator e precisa de status próprio de processamento.</p>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">request_id</div><div class="field-type">UUID FK</div><div class="field-desc">Solicitação de origem</div></div>
+          <div class="field-row"><div class="field-name">kind</div><div class="field-type">ENUM</div><div class="field-desc">minuta_terceiro | proposta_comercial | documento_apoio</div></div>
+          <div class="field-row"><div class="field-name">file_path / file_name</div><div class="field-type">TEXT / VARCHAR</div><div class="field-desc">Arquivo no storage, prefixado por tenant</div></div>
+          <div class="field-row"><div class="field-name">extraction_status</div><div class="field-type">ENUM</div><div class="field-desc">nao_aplicavel | pendente | processado | falhou — só minutas de terceiro passam pelo Extrator</div></div>
+          <div class="field-row"><div class="field-name">extracted_data</div><div class="field-type">JSONB NULL</div><div class="field-desc">Partes, valor, vigência e cláusulas que o Agente Extrator identificou, com nível de confiança por campo</div></div>
+          <div class="field-row"><div class="field-name">carried_to_contract</div><div class="field-type">BOOLEAN</div><div class="field-desc">true = anexo foi levado ao dossiê do contrato na conversão, não ficou preso na Solicitação</div></div>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">📋 contracts <span class="badge badge-yellow">generalizado</span></div>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">title</div><div class="field-type">VARCHAR(255)</div><div class="field-desc">Título do contrato</div></div>
+          <div class="field-row"><div class="field-name">category_id</div><div class="field-type">UUID FK</div><div class="field-desc">Substitui o ENUM fixo do produto interno — aponta para <code>contract_categories</code></div></div>
+          <div class="field-row"><div class="field-name">request_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Solicitação de origem. Null apenas em contratos criados direto pelo Jurídico/admin — a métrica de governança acompanha esse percentual</div></div>
+          <div class="field-row"><div class="field-name">status</div><div class="field-type">ENUM</div><div class="field-desc">rascunho | revisao | aprovacao | assinatura | vigente | expirado | rescindido | cancelado</div></div>
+          <div class="field-row"><div class="field-name">counterparty_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Contraparte central vinculada</div></div>
+          <div class="field-row"><div class="field-name">template_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Template base (null = upload manual)</div></div>
+          <div class="field-row"><div class="field-name">value</div><div class="field-type">DECIMAL(15,2)</div><div class="field-desc">Valor do contrato (base para alçadas)</div></div>
+          <div class="field-row"><div class="field-name">start_date / end_date</div><div class="field-type">DATE / DATE NULL</div><div class="field-desc">Vigência (null em <code>end_date</code> = prazo indeterminado)</div></div>
+          <div class="field-row"><div class="field-name">auto_renewal</div><div class="field-type">BOOLEAN</div><div class="field-desc">Contrato tem cláusula de renovação automática — muda a natureza do alerta: aqui o risco é <em>deixar</em> renovar sem querer</div></div>
+          <div class="field-row"><div class="field-name">notice_period_days</div><div class="field-type">SMALLINT NULL</div><div class="field-desc">Prazo de aviso prévio obrigatório para rescisão/não renovação — base para calcular a data-limite de decisão</div></div>
+          <div class="field-row"><div class="field-name">document_hash</div><div class="field-type">CHAR(64)</div><div class="field-desc">SHA-256 do PDF assinado final</div></div>
+          <div class="field-row"><div class="field-name">field_data</div><div class="field-type">JSONB</div><div class="field-desc">Dados preenchidos no formulário do template</div></div>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">📎 contracts — bloco de aditivos <span class="badge badge-red">novo</span></div>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:10px">Aditivo é um <code>Contract</code> como qualquer outro (tem sua própria minuta, aprovação e assinatura), diferenciado apenas por apontar para um contrato pai. Estes campos vivem na mesma tabela <code>contracts</code> e ficam nulos em contratos originais.</p>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">parent_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Contrato original. Preenchido obrigatoriamente na criação a partir da tela do contrato pai — nunca editável depois</div></div>
+          <div class="field-row"><div class="field-name">addendum_type</div><div class="field-type">ENUM NULL</div><div class="field-desc">aditivo | renovacao | reajuste | rescisao | distrato | apostilamento</div></div>
+          <div class="field-row"><div class="field-name">addendum_number</div><div class="field-type">SMALLINT NULL</div><div class="field-desc">Sequencial por contrato pai (1º aditivo, 2º aditivo…), gerado pelo sistema</div></div>
+          <div class="field-row"><div class="field-name">addendum_reason</div><div class="field-type">TEXT NULL</div><div class="field-desc">Justificativa do aditivo — obrigatória, entra no dossiê e no briefing de aprovação</div></div>
+          <div class="field-row"><div class="field-name">effective_date</div><div class="field-type">DATE NULL</div><div class="field-desc">Data em que o aditivo passa a valer (pode diferir da data de assinatura)</div></div>
+          <div class="field-row"><div class="field-name">supersedes_end_date</div><div class="field-type">DATE NULL</div><div class="field-desc">Nova data de fim de vigência que este aditivo impõe ao contrato pai — o motor de prazos passa a usar esta data</div></div>
+          <div class="field-row"><div class="field-name">supersedes_value</div><div class="field-type">DECIMAL(15,2) NULL</div><div class="field-desc">Novo valor que este aditivo impõe ao pai (reajuste, ampliação de escopo) — base recalculada para alçadas futuras</div></div>
+          <div class="field-row"><div class="field-name">applied_to_parent_at</div><div class="field-type">TIMESTAMPTZ NULL</div><div class="field-desc">Quando os efeitos foram propagados ao contrato pai — só após a assinatura completa do aditivo</div></div>
+        </div>
+      </div>
+      <div class="callout info" style="margin-top:-8px">
+        <p><strong>Regra de propagação:</strong> um aditivo só altera vigência ou valor do contrato pai <em>depois</em> de totalmente assinado — nunca no rascunho. Ao propagar, o sistema recalcula os marcos e a fila de prazos do pai automaticamente, e o histórico de valores/vigências anteriores fica preservado na cadeia de aditivos (nada é sobrescrito sem rastro).</p>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">🤝 counterparties <span class="badge badge-red">novo — generaliza suppliers</span></div>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">name</div><div class="field-type">VARCHAR(255)</div><div class="field-desc">Razão social / nome</div></div>
+          <div class="field-row"><div class="field-name">cnpj_cpf</div><div class="field-type">VARCHAR(18)</div><div class="field-desc">Documento — chave de dedup</div></div>
+          <div class="field-row"><div class="field-name">role</div><div class="field-type">ENUM</div><div class="field-desc">fornecedor | cliente | parceiro | outro — livre, não trava o tipo de contrato</div></div>
+          <div class="field-row"><div class="field-name">contact_email / contact_phone</div><div class="field-type">VARCHAR</div><div class="field-desc">Contato principal</div></div>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">📜 compliance_documents <span class="badge badge-red">novo — generaliza certidões</span></div>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">counterparty_id</div><div class="field-type">UUID FK</div><div class="field-desc">Contraparte titular do documento</div></div>
+          <div class="field-row"><div class="field-name">type</div><div class="field-type">ENUM</div><div class="field-desc">cnd_federal | cnd_estadual | cnd_municipal | fgts | trabalhista | outro</div></div>
+          <div class="field-row"><div class="field-name">expires_at</div><div class="field-type">DATE</div><div class="field-desc">Data de validade</div></div>
+          <div class="field-row"><div class="field-name">recurrence_months</div><div class="field-type">SMALLINT NULL</div><div class="field-desc">Cadência do lembrete de renovação</div></div>
+          <div class="field-row"><div class="field-name">status</div><div class="field-type">ENUM</div><div class="field-desc">valida | vencendo | vencida</div></div>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">💬 contract_messages <span class="badge badge-red">novo — chat interno</span></div>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:10px">Thread interna do contrato. Tabela <strong>separada</strong> de <code>negotiation_comments</code> por decisão de segurança: nenhuma linha desta tabela é lida pelo endpoint público de negociação, o que impede estruturalmente que estratégia interna vaze para a contraparte.</p>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">contract_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Contrato da conversa</div></div>
+          <div class="field-row"><div class="field-name">request_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Solicitação, quando a conversa começou antes de existir contrato — na conversão as mensagens passam a aparecer no contrato sem perder autoria nem data</div></div>
+          <div class="field-row"><div class="field-name">author_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Autor. Null quando <code>kind = sistema</code></div></div>
+          <div class="field-row"><div class="field-name">kind</div><div class="field-type">ENUM</div><div class="field-desc">humano | sistema — eventos de ciclo de vida (aprovado, assinado, aditivado) entram na mesma linha do tempo</div></div>
+          <div class="field-row"><div class="field-name">body</div><div class="field-type">TEXT</div><div class="field-desc">Texto da mensagem</div></div>
+          <div class="field-row"><div class="field-name">mentioned_user_ids</div><div class="field-type">UUID[]</div><div class="field-desc">Menções (@) — cada uma gera um <code>notification_item</code> para o digest da pessoa</div></div>
+          <div class="field-row"><div class="field-name">created_at</div><div class="field-type">TIMESTAMPTZ</div><div class="field-desc">Data/hora — imutável, sem edição nem exclusão de mensagem</div></div>
+        </div>
+      </div>
+      <div class="callout info" style="margin-top:-8px">
+        <p><strong>Regra de integridade:</strong> mensagem não é editável nem apagável. Um histórico de decisões que pode ser reescrito não serve de prova em auditoria nem em litígio — e é justamente nesses dois momentos que ele importa. Correções são feitas por nova mensagem, preservando o que foi dito antes. A <code>CHECK</code> garante que exatamente um entre <code>contract_id</code> e <code>request_id</code> esteja preenchido.</p>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">🤝 negotiation_comments <span class="badge badge-red">novo — thread externa</span></div>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">contract_id</div><div class="field-type">UUID FK</div><div class="field-desc">Contrato em negociação</div></div>
+          <div class="field-row"><div class="field-name">author_type</div><div class="field-type">ENUM</div><div class="field-desc">interno | externo. <strong>Atenção:</strong> <code>interno</code> aqui significa alguém da empresa escrevendo <em>para</em> a contraparte — tudo nesta tabela é visível no link externo. Conversa que não pode ser vista pela contraparte vai em <code>contract_messages</code></div></div>
+          <div class="field-row"><div class="field-name">author_user_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Preenchido quando <code>author_type = interno</code></div></div>
+          <div class="field-row"><div class="field-name">external_name / external_email</div><div class="field-type">VARCHAR</div><div class="field-desc">Identificação de quem comentou externamente, sem conta</div></div>
+          <div class="field-row"><div class="field-name">body</div><div class="field-type">TEXT</div><div class="field-desc">Texto do comentário</div></div>
+          <div class="field-row"><div class="field-name">attachment_path</div><div class="field-type">TEXT NULL</div><div class="field-desc">Versão ajustada anexada pela contraparte, se houver</div></div>
+          <div class="field-row"><div class="field-name">status</div><div class="field-type">ENUM</div><div class="field-desc">pendente | aceito | recusado — decisão do Jurídico sobre o ajuste sugerido</div></div>
+          <div class="field-row"><div class="field-name">negotiation_token</div><div class="field-type">VARCHAR(128) NULL</div><div class="field-desc">Token do link de negociação usado — mesmo padrão de expiração (72h) do link de assinatura</div></div>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">📅 contract_milestones</div>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">contract_id</div><div class="field-type">UUID FK</div><div class="field-desc">Contrato pai</div></div>
+          <div class="field-row"><div class="field-name">label</div><div class="field-type">VARCHAR(255)</div><div class="field-desc">Ex: "Fim de vigência", "Prazo de aviso prévio", "Entrega da etapa 2", "Data de reajuste"</div></div>
+          <div class="field-row"><div class="field-name">milestone_type</div><div class="field-type">ENUM</div><div class="field-desc">fim_vigencia | aviso_previo | renovacao_automatica | reajuste | entrega | pagamento | obrigacao | outro</div></div>
+          <div class="field-row"><div class="field-name">due_date</div><div class="field-type">DATE</div><div class="field-desc"><strong>Data-alvo do marco</strong> conforme o contrato — a data que não pode ser perdida</div></div>
+          <div class="field-row"><div class="field-name">internal_action_date</div><div class="field-type">DATE NULL</div><div class="field-desc"><strong>Data-limite interna</strong> para agir (anterior à <code>due_date</code>) — sugerida pelo Agente Leitor de Marcos, confirmada por humano</div></div>
+          <div class="field-row"><div class="field-name">alert_days_before</div><div class="field-type">INTEGER[]</div><div class="field-desc">Antecedências de notificação em dias, ex: <code>[90,60,30,15,7]</code> — cada valor gera uma data de disparo</div></div>
+          <div class="field-row"><div class="field-name">notify_user_ids</div><div class="field-type">UUID[]</div><div class="field-desc">Usuários notificados a cada disparo</div></div>
+          <div class="field-row"><div class="field-name">next_alert_at</div><div class="field-type">TIMESTAMPTZ NULL</div><div class="field-desc"><strong>Próxima entrada no digest</strong> — campo que o job diário consulta para gerar o <code>notification_item</code>; recalculado após cada geração</div></div>
+          <div class="field-row"><div class="field-name">last_alert_at</div><div class="field-type">TIMESTAMPTZ NULL</div><div class="field-desc">Última vez que este marco entrou em um digest</div></div>
+          <div class="field-row"><div class="field-name">alerts_sent_count</div><div class="field-type">SMALLINT</div><div class="field-desc">Em quantos digests este marco já apareceu</div></div>
+          <div class="field-row"><div class="field-name">criticality</div><div class="field-type">ENUM</div><div class="field-desc">alta | media | baixa — classificada pelo agente, ajustável; define se entra na fila de tratamento ativo</div></div>
+          <div class="field-row"><div class="field-name">source</div><div class="field-type">ENUM</div><div class="field-desc">manual | agente_ia — origem do marco, para auditoria das sugestões aceitas</div></div>
+          <div class="field-row"><div class="field-name">completed_at</div><div class="field-type">TIMESTAMPTZ NULL</div><div class="field-desc">Marco cumprido — encerra os alertas pendentes</div></div>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">⚠️ deadline_treatments</div>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">contract_id</div><div class="field-type">UUID FK</div><div class="field-desc">Contrato com prazo a tratar</div></div>
+          <div class="field-row"><div class="field-name">milestone_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Marco que originou o tratamento (null = fim de vigência geral)</div></div>
+          <div class="field-row"><div class="field-name">deadline_date</div><div class="field-type">DATE</div><div class="field-desc">Data do prazo contratual real — imutável após a criação</div></div>
+          <div class="field-row"><div class="field-name">entered_queue_at</div><div class="field-type">TIMESTAMPTZ</div><div class="field-desc">Quando entrou na fila de tratamento (automático pelo motor de prazos)</div></div>
+          <div class="field-row"><div class="field-name">responsible_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Usuário designado pelo Gestor de Contratos</div></div>
+          <div class="field-row"><div class="field-name">assigned_at</div><div class="field-type">TIMESTAMPTZ NULL</div><div class="field-desc">Quando o responsável foi designado — base da métrica "prazo sem responsável"</div></div>
+          <div class="field-row"><div class="field-name">expected_action</div><div class="field-type">ENUM</div><div class="field-desc">renovar | executar | renegociar | encerrar | aguardar | a_definir</div></div>
+          <div class="field-row"><div class="field-name">internal_deadline</div><div class="field-type">DATE</div><div class="field-desc"><strong>Prazo interno para concluir a ação</strong>, anterior ao prazo contratual — o que dispara o escalonamento</div></div>
+          <div class="field-row"><div class="field-name">next_reminder_at</div><div class="field-type">TIMESTAMPTZ NULL</div><div class="field-desc"><strong>Próxima cobrança agendada</strong> ao responsável enquanto o tratamento estiver aberto</div></div>
+          <div class="field-row"><div class="field-name">reminder_interval_days</div><div class="field-type">SMALLINT</div><div class="field-desc">Cadência da cobrança (ex: a cada 7 dias até resolver)</div></div>
+          <div class="field-row"><div class="field-name">last_reminder_at</div><div class="field-type">TIMESTAMPTZ NULL</div><div class="field-desc">Última cobrança enviada</div></div>
+          <div class="field-row"><div class="field-name">status</div><div class="field-type">ENUM</div><div class="field-desc">aguardando_designacao | em_andamento | concluido | perdido | escalado</div></div>
+          <div class="field-row"><div class="field-name">escalated_at</div><div class="field-type">TIMESTAMPTZ NULL</div><div class="field-desc">Quando escalou por falta de ação até o <code>internal_deadline</code></div></div>
+          <div class="field-row"><div class="field-name">escalated_to</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Para quem escalou (superior ou Jurídico)</div></div>
+          <div class="field-row"><div class="field-name">outcome</div><div class="field-type">ENUM NULL</div><div class="field-desc">renovado | executado | renegociado | encerrado | perdido_sem_acao | perdido_justificado</div></div>
+          <div class="field-row"><div class="field-name">outcome_notes</div><div class="field-type">TEXT NULL</div><div class="field-desc">Justificativa ou descrição do resultado registrado</div></div>
+          <div class="field-row"><div class="field-name">resulting_contract_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Aditivo/renovação gerado a partir deste tratamento — fecha o ciclo prazo → aditivo</div></div>
+          <div class="field-row"><div class="field-name">resolved_at</div><div class="field-type">TIMESTAMPTZ NULL</div><div class="field-desc">Quando o tratamento foi encerrado (concluído ou perdido)</div></div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Arquitetura de notificação — digest diário:</strong> o usuário nunca recebe um e-mail por prazo. O sistema separa <em>gerar o aviso</em> de <em>entregar o aviso</em>: cada evento cria um <code>notification_item</code> pendente, e um job diário agrupa todos os itens de cada pessoa em <strong>um único e-mail</strong> (<code>notification_digests</code>). Essa separação em duas tabelas é o que permite manter a auditoria item a item — provar que um prazo específico foi avisado — sem transformar isso em uma caixa de entrada inundada.</p>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">🔔 notification_items <span class="badge badge-red">novo</span></div>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:10px">Um registro por aviso que precisa chegar a alguém. Criado pelos motores (prazos, SLA, compliance, aprovação) e consumido pelo digest. É a evidência auditável de que o prazo entrou na fila de aviso.</p>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">event_type</div><div class="field-type">ENUM</div><div class="field-desc">marco_proximo | prazo_na_fila | prazo_escalado | cobranca_responsavel | certidao_vencendo | aguardando_aprovacao | ajuste_contraparte | sla_em_risco | limite_assentos</div></div>
+          <div class="field-row"><div class="field-name">source_type / source_id</div><div class="field-type">ENUM / UUID</div><div class="field-desc">Origem polimórfica: milestone | deadline_treatment | compliance_document | contract</div></div>
+          <div class="field-row"><div class="field-name">recipient_user_id</div><div class="field-type">UUID FK</div><div class="field-desc">Destinatário — o digest é sempre por pessoa</div></div>
+          <div class="field-row"><div class="field-name">severity</div><div class="field-type">ENUM</div><div class="field-desc">critico | atencao | informativo — define a seção e a ordem dentro do e-mail</div></div>
+          <div class="field-row"><div class="field-name">title / summary</div><div class="field-type">VARCHAR / TEXT</div><div class="field-desc">Linha e detalhe curto renderizados no digest</div></div>
+          <div class="field-row"><div class="field-name">deep_link</div><div class="field-type">TEXT</div><div class="field-desc">URL direta para o contrato/prazo — cada linha do e-mail é clicável</div></div>
+          <div class="field-row"><div class="field-name">available_at</div><div class="field-type">TIMESTAMPTZ</div><div class="field-desc">A partir de quando o item pode entrar em um digest (data de alerta calculada)</div></div>
+          <div class="field-row"><div class="field-name">digest_id</div><div class="field-type">UUID FK NULL</div><div class="field-desc">Digest que entregou este item — null enquanto pendente</div></div>
+          <div class="field-row"><div class="field-name">dedup_key</div><div class="field-type">VARCHAR(255)</div><div class="field-desc">Chave única por (destinatário + origem + antecedência + dia) — impede que o mesmo prazo apareça duas vezes no mesmo digest</div></div>
+          <div class="field-row"><div class="field-name">resolved_at</div><div class="field-type">TIMESTAMPTZ NULL</div><div class="field-desc">Item cujo motivo deixou de existir antes do envio (prazo tratado no mesmo dia) — sai do digest sem ser enviado</div></div>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">📬 notification_digests <span class="badge badge-red">novo</span></div>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:10px">Um registro por pessoa por dia — o e-mail efetivamente enviado, com o status de entrega.</p>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">id</div><div class="field-type">UUID PK</div><div class="field-desc">Identificador único</div></div>
+          <div class="field-row"><div class="field-name">recipient_user_id</div><div class="field-type">UUID FK</div><div class="field-desc">Destinatário do digest</div></div>
+          <div class="field-row"><div class="field-name">reference_date</div><div class="field-type">DATE</div><div class="field-desc">Dia de referência — <code>UNIQUE (recipient_user_id, reference_date)</code> garante um único digest por pessoa por dia</div></div>
+          <div class="field-row"><div class="field-name">channel</div><div class="field-type">ENUM</div><div class="field-desc">email | whatsapp — e-mail é o canal padrão do digest</div></div>
+          <div class="field-row"><div class="field-name">recipient_address</div><div class="field-type">VARCHAR(255)</div><div class="field-desc">Endereço efetivamente usado no envio</div></div>
+          <div class="field-row"><div class="field-name">item_count</div><div class="field-type">SMALLINT</div><div class="field-desc">Quantos itens foram consolidados</div></div>
+          <div class="field-row"><div class="field-name">critical_count</div><div class="field-type">SMALLINT</div><div class="field-desc">Quantos itens críticos — usado no assunto do e-mail (ex.: "3 prazos exigem sua atenção hoje")</div></div>
+          <div class="field-row"><div class="field-name">scheduled_for</div><div class="field-type">TIMESTAMPTZ</div><div class="field-desc">Horário de envio conforme a preferência do tenant</div></div>
+          <div class="field-row"><div class="field-name">sent_at</div><div class="field-type">TIMESTAMPTZ NULL</div><div class="field-desc">Envio efetivo</div></div>
+          <div class="field-row"><div class="field-name">delivery_status</div><div class="field-type">ENUM</div><div class="field-desc">agendado | enviado | entregue | falhou — atualizado por webhook do Resend / Evolution API</div></div>
+          <div class="field-row"><div class="field-name">error_detail</div><div class="field-type">TEXT NULL</div><div class="field-desc">Motivo da falha, para reprocessamento</div></div>
+        </div>
+      </div>
+
+      <div class="model-block">
+        <div class="model-name">⚙️ notification_settings <span class="badge badge-red">novo</span></div>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:10px">Configuração por tenant — definida na implantação, ajustável pelo admin.</p>
+        <div class="model-fields">
+          <div class="field-row field-header"><div>Campo</div><div>Tipo</div><div>Descrição</div></div>
+          <div class="field-row"><div class="field-name">digest_send_time</div><div class="field-type">TIME</div><div class="field-desc">Horário de envio do digest (padrão 08:00 BRT)</div></div>
+          <div class="field-row"><div class="field-name">digest_weekdays_only</div><div class="field-type">BOOLEAN</div><div class="field-desc">true = não envia sábado/domingo; itens acumulam para o próximo dia útil</div></div>
+          <div class="field-row"><div class="field-name">skip_if_empty</div><div class="field-type">BOOLEAN</div><div class="field-desc">Padrão true — sem itens pendentes, nenhum e-mail é enviado</div></div>
+          <div class="field-row"><div class="field-name">immediate_event_types</div><div class="field-type">TEXT[]</div><div class="field-desc">Exceções que saem na hora em vez de esperar o digest — padrão vazio (tudo no digest)</div></div>
+        </div>
+      </div>
+
+      <p style="font-size:13px;color:var(--gray)">Modelos sem mudança estrutural relevante em relação ao produto interno: <code>contract_templates</code>, <code>template_versions</code>, <code>signatories</code>, <code>sla_rules</code>, <code>contract_sla_tracking</code>, <code>departments</code>, <code>ai_agent_runs</code>, <code>audit_log</code> — replicados por schema de tenant, sem campo <code>company_id</code> (isolamento agora é físico, não lógico).</p>
+      <div class="callout warn">
+        <p><strong>Nota de migração:</strong> <code>ai_agent_runs</code> guarda o identificador do modelo usado em cada execução. Com a troca de provedor de IA, o campo passa a registrar os modelos da OpenAI (<code>gpt-4.1</code>, <code>gpt-4.1-mini</code>) — execuções históricas mantêm o valor antigo, sem reescrita retroativa, para que a auditoria continue fiel ao que realmente rodou.</p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ API -->
+    <section id="api" class="section">
+      <div class="page-label">SPECS — API</div>
+      <h1>APIs</h1>
+      <p class="lead">Duas famílias de endpoint: <code>/api/platform/*</code> (cross-tenant, resolve sem <code>search_path</code> de tenant) e <code>/api/v1/*</code> (dentro do schema do tenant resolvido pelo subdomínio).</p>
+
+      <h2>Plataforma — Onboarding e Billing</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Método</th><th>Endpoint</th><th>Descrição</th><th>Papéis</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/platform/tenants</code></td><td>Cria tenant + dispara provisionamento de schema</td><td>staff Pacta (console interno, após fechamento comercial)</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/platform/tenants/:id/status</code></td><td>Status de provisionamento (acompanhado pela implantação)</td><td>staff Pacta, admin do tenant</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/platform/plans</code></td><td>Lista planos disponíveis (apoio à conversa comercial)</td><td>staff Pacta</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/platform/subscriptions</code></td><td>Cria assinatura via gateway de pagamento no fechamento</td><td>staff Pacta</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/platform/webhooks/billing</code></td><td>Recebe eventos do gateway (Stripe/Asaas)</td><td>gateway (assinado)</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/platform/staff/tenants</code></td><td>Painel cross-tenant de saúde e uso</td><td>staff Pacta</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Tenant — Categorias e Contrapartes</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Método</th><th>Endpoint</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/contract-categories</code></td><td>Lista categorias do tenant</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contract-categories</code></td><td>Cria categoria personalizada</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/counterparties</code></td><td>Lista/busca contrapartes</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/counterparties/:id/contracts</code></td><td>Histórico de contratos daquela contraparte</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/compliance-documents</code></td><td>Lista com filtro por status</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Tenant — Solicitações</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Método</th><th>Endpoint</th><th>Descrição</th><th>Papéis</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contract-requests</code></td><td>Abre Solicitação — com modelo sugerido, anexo ou apenas descrição</td><td>todos os papéis do tenant</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/contract-requests</code></td><td>Lista Solicitações — o <code>visualizador</code> vê só as próprias; Jurídico e Gestão veem todas</td><td>todos (escopo por papel)</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/contract-requests/:id</code></td><td>Detalhe com anexos, dados extraídos e histórico de triagem</td><td>solicitante, jurídico, gestão, admin</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contract-requests/:id/attachments</code></td><td>Anexa minuta de terceiro, proposta comercial ou documento de apoio</td><td>solicitante, jurídico</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contract-requests/:id/agents/extract</code></td><td>Aciona o Extrator sobre a minuta/proposta anexada</td><td>jurídico, admin</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contract-requests/:id/agents/review</code></td><td>Aciona o Revisor Jurídico — relatório de risco por cláusula</td><td>jurídico, admin</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contract-requests/:id/agents/draft</code></td><td>Aciona o Redator — gera a minuta a partir do modelo + dados da análise</td><td>jurídico, admin</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/contract-requests/:id/agent-runs</code></td><td>Saídas dos agentes nesta Solicitação, para revisão antes de converter</td><td>jurídico, admin</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contract-requests/:id/convert</code></td><td>Converte em <code>Contract</code> — leva a minuta produzida na análise, os anexos e o chat para o contrato</td><td>jurídico, admin</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contract-requests/:id/reject</code></td><td>Recusa com motivo ou pedido de mais informação — não gera contrato</td><td>jurídico, gestão de contratos, admin</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/contract-requests/available-templates</code></td><td>Modelos que o solicitante pode escolher, filtrados pelo que foi liberado a ele</td><td>todos os papéis do tenant</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Tenant — Chat Interno do Contrato</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Método</th><th>Endpoint</th><th>Descrição</th><th>Papéis</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/contracts/:id/messages</code></td><td>Thread interna, incluindo eventos de sistema e as mensagens herdadas da Solicitação</td><td>quem tem acesso ao contrato</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contracts/:id/messages</code></td><td>Posta mensagem, com menções (@) que entram no digest dos citados</td><td>quem tem acesso ao contrato</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/contract-requests/:id/messages</code></td><td>Thread da Solicitação, antes de existir contrato</td><td>solicitante, jurídico, gestão, admin</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contract-requests/:id/messages</code></td><td>Posta mensagem na Solicitação — é aqui que o Jurídico pede esclarecimento sem recusar o pedido</td><td>solicitante, jurídico, gestão, admin</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout warn"><p><strong>Nenhum endpoint público lê <code>contract_messages</code>.</strong> Toda rota de chat interno exige sessão autenticada com acesso ao contrato — não existe variante por token. É o que garante que a thread interna nunca seja alcançável pelo link de negociação.</p></div>
+
+      <h2>Tenant — Negociação com a Contraparte</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Método</th><th>Endpoint</th><th>Descrição</th><th>Papéis</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/contracts/:id/negotiation-comments</code></td><td>Lista o histórico de negociação do contrato</td><td>time interno com acesso ao contrato</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contracts/:id/negotiation-comments</code></td><td>Posta comentário interno</td><td>jurídico, aprovador, admin</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/public/negotiation/:token/comments</code></td><td>Contraparte comenta ou anexa versão ajustada via link, sem login</td><td>público (token de 72h)</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/negotiation-comments/:comment_id/decision</code></td><td>Jurídico aceita (atualiza minuta) ou recusa o ajuste sugerido</td><td>jurídico, admin</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Tenant — Contratos, Aprovação e Assinatura</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Método</th><th>Endpoint</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/contracts</code></td><td>Lista com filtros</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contracts</code></td><td>Cria contrato a partir de template</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contracts/:id/approve</code></td><td>Aprova/rejeita conforme alçada</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contracts/:id/send-for-signature</code></td><td>Envia para ClickSign via SignatureProvider</td></tr>
+            <tr><td><span class="badge badge-orange">WEBHOOK</span></td><td><code>/api/v1/webhooks/clicksign</code></td><td>Recebe evento de assinatura concluída</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/ai-agents/:agent/run</code></td><td>Aciona agente sob demanda (ex: Extrator, Leitor de Marcos)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Tenant — Marcos, Prazos e Aditivos</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Método</th><th>Endpoint</th><th>Descrição</th><th>Papéis</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/contracts/:id/milestones</code></td><td>Lista marcos com datas de disparo e status de alerta</td><td>quem tem acesso ao contrato</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contracts/:id/milestones</code></td><td>Cria marco com <code>due_date</code>, <code>internal_action_date</code> e <code>alert_days_before</code></td><td>jurídico, gestor de contratos, admin</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contracts/:id/milestones/bulk-confirm</code></td><td>Confirma em lote os marcos propostos pelo Agente Leitor de Marcos</td><td>jurídico, gestor de contratos</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/deadline-treatments</code></td><td>Fila de prazos com filtro por status, responsável e janela (90/60/30 dias)</td><td>gestor de contratos, admin</td></tr>
+            <tr><td><span class="badge badge-orange">PATCH</span></td><td><code>/api/v1/deadline-treatments/:id/assign</code></td><td>Designa responsável, ação esperada e prazo interno</td><td>gestor de contratos, admin</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/deadline-treatments/:id/resolve</code></td><td>Registra resultado e justificativa, encerrando o tratamento</td><td>responsável designado, gestor de contratos</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/contracts/:id/addenda</code></td><td>Lista aditivos vinculados ao contrato</td><td>quem tem acesso ao contrato</td></tr>
+            <tr><td><span class="badge badge-green">POST</span></td><td><code>/api/v1/contracts/:id/addenda</code></td><td>Cria aditivo já vinculado (<code>parent_id = :id</code>) — único ponto de criação, herda empresa/contraparte/categoria do pai</td><td>jurídico, admin</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/notification-items</code></td><td>Avisos gerados por contrato/marco — evidência auditável item a item, mesmo que entregues em digest</td><td>gestor de contratos, jurídico, admin</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/notification-digests</code></td><td>Histórico de digests enviados e status de entrega</td><td>gestor de contratos, admin</td></tr>
+            <tr><td><span class="badge badge-blue">GET</span></td><td><code>/api/v1/notification-digests/preview</code></td><td>Prévia do digest do dia para o usuário logado — permite conferir o que chegaria sem esperar o horário</td><td>todos (o próprio digest)</td></tr>
+            <tr><td><span class="badge badge-orange">PATCH</span></td><td><code>/api/v1/notification-settings</code></td><td>Ajusta horário, dias úteis e exceções de envio imediato</td><td>admin do tenant</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ FLOWS -->
+    <section id="flows" class="section">
+      <div class="page-label">SPECS — Fluxos</div>
+      <h1>Fluxos de Sistema</h1>
+
+      <h2>Fluxo 1 — Vendas e Implantação Assistida</h2>
+      <div class="flow">
+        <div class="flow-step">Conversa comercial e demonstração personalizada</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Proposta e fechamento do contrato</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Time de implantação provisiona o schema (Alembic + seed do pacote de setor)</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Categorias, alçadas e SLA configurados junto com o admin do tenant</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Migração assistida de contratos existentes + time convidado</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Primeiro contrato criado com acompanhamento da implantação</div>
+      </div>
+
+      <h2>Fluxo 2 — Da Solicitação ao Contrato Vigente</h2>
+      <div class="flow">
+        <div class="flow-step">Bruno abre Solicitação (modelo sugerido ou minuta anexada)</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Entra na fila de análise do Jurídico</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Camila analisa e aciona os agentes que quiser: Extrator → Revisor → Redator</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Minuta produzida e revisada por ela</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Converte em Contract · minuta, anexos e chat vão junto</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Aprovação conforme alçada, com briefing gerado por IA</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Negociação com a contraparte, se a categoria pedir</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Assinatura via ClickSign · webhook atualiza status</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Contrato vigente · marcos monitorados</div>
+      </div>
+      <div class="callout info"><p><strong>A análise é o coração do fluxo.</strong> É nela que o Jurídico transforma um pedido em linguagem de negócio numa minuta juridicamente válida — usando os agentes como ferramenta de leitura e redação, na ordem que fizer sentido para o caso. Uma Solicitação com modelo interno e valor baixo pode sair da análise em minutos; uma minuta de terceiro complexa passa pelos três agentes e ainda assim depende do julgamento dela.</p></div>
+      <div class="callout info"><p><strong>Caminho da recusa:</strong> se a Solicitação estiver incompleta, Camila recusa com o que falta. Bruno é notificado, complementa e reabre — e nada disso gera um contrato no repositório. A Solicitação recusada fica no histórico de pedidos, não no acervo contratual.</p></div>
+      <div class="callout warn"><p><strong>Minuta de terceiro é o caso mais valioso e o mais frágil:</strong> quando o contrato vem redigido pela contraparte, é ali que mora o risco jurídico — cláusulas fora do padrão, foro desfavorável, multa assimétrica. Por isso a triagem desse caminho nunca é só "anexar e converter": o Extrator lê o documento e o Revisor Jurídico aponta os desvios <em>antes</em> de o contrato entrar no fluxo de aprovação.</p></div>
+
+      <h2>Fluxo 3 — Negociação da Minuta com a Contraparte</h2>
+      <div class="flow">
+        <div class="flow-step">Minuta gerada e revisada internamente</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Link de negociação enviado à contraparte (token, 72h)</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Contraparte comenta ou anexa versão ajustada</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Jurídico revisa o ajuste</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Aceita (atualiza minuta) ou recusa (mantém original)</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Segue para aprovação (se aplicável) e assinatura</div>
+      </div>
+      <div class="callout info"><p><strong>Quando esse fluxo entra:</strong> categorias marcadas como negociáveis (ex.: contratos de fornecimento, parcerias) ativam esse passo por padrão; categorias fixas/padronizadas (ex.: NDA, prestação de serviço de baixo valor) pulam direto da revisão para a aprovação/assinatura.</p></div>
+
+      <h2>Fluxo 4 — Geração de Avisos e Digest Diário</h2>
+      <div class="flow">
+        <div class="flow-step">Job varre marcos, SLAs e certidões com data de alerta atingida</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Gera <code>notification_items</code> pendentes — nenhum e-mail sai aqui</div><div class="flow-arrow">→</div>
+        <div class="flow-step">No horário do tenant, job de digest agrupa itens por pessoa</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Um único e-mail por destinatário, seções por severidade</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Itens marcados com <code>digest_id</code> · entrega confirmada por webhook</div>
+      </div>
+      <div class="callout info"><p><strong>Como as datas viram itens:</strong> cada valor de <code>alert_days_before</code> gera uma data (<code>due_date</code> − N dias); <code>next_alert_at</code> guarda sempre a próxima ainda não gerada, e é o único campo que a varredura consulta — barato mesmo com milhares de marcos ativos. Um prazo que aparece em várias antecedências gera um item por antecedência, mas o <code>dedup_key</code> garante que ele nunca apareça duas vezes no mesmo digest. Se o prazo for tratado antes do horário de envio, o item é marcado como <code>resolved_at</code> e simplesmente não entra no e-mail — o usuário não é cobrado por algo que já resolveu.</p></div>
+      <div class="callout success"><p><strong>Se não há nada pendente, nenhum e-mail é enviado</strong> (<code>skip_if_empty</code>). Essa regra é o que preserva o valor do digest: um e-mail que chega todo dia mesmo vazio é um e-mail que as pessoas param de abrir — e aí o prazo crítico do dia 40 passa batido junto com o resto.</p></div>
+
+      <h2>Fluxo 5 — Tratamento de Prazo e Aditivo</h2>
+      <div class="flow">
+        <div class="flow-step">Marco crítico abre <code>deadline_treatment</code> na fila</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Gestor designa responsável e ação esperada</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Cobrança periódica ao responsável — sempre via digest</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Sem ação até o <code>internal_deadline</code> → escalona</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Ação "renovar" gera aditivo vinculado ao contrato pai</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Aditivo assinado propaga nova vigência · marcos recalculados</div>
+      </div>
+
+      <h2>Fluxo 6 — Ciclo de Cobrança</h2>
+      <div class="flow">
+        <div class="flow-step">Time comercial cria a assinatura no fechamento</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Cobrança recorrente por plano via gateway</div><div class="flow-arrow">→</div>
+        <div class="flow-step">Convite de usuário valida <code>seat_limit</code> do plano</div><div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Limite atingido → admin alertado, upgrade via comercial</div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ ROLES -->
+    <section id="roles" class="section">
+      <div class="page-label">SPECS — Controle de Acesso</div>
+      <h1>Controle de Acesso</h1>
+      <p class="lead">Cinco papéis dentro do tenant, mais o papel <code>staff</code> da plataforma (equipe Pacta), com acesso cross-tenant restrito e auditado.</p>
+
+      <div class="callout">
+        <p><strong>O papel <code>visualizador</code> é o solicitante.</strong> Ele não é um espectador passivo: é qualquer colaborador da empresa que precisa de um contrato e abre uma Solicitação — escolhendo um modelo disponível ou anexando a minuta que o fornecedor mandou. É o papel mais numeroso do tenant e o ponto de entrada de todo o ciclo. O que ele <em>não</em> faz é criar contrato direto, aprovar ou configurar nada.</p>
+      </div>
+
+      <h2>Matriz de Permissões</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Funcionalidade</th><th>Visualizador<br><span style="font-weight:400;text-transform:none;letter-spacing:0">(solicitante)</span></th><th>Aprovador</th><th>Jurídico</th><th>Gestor de Contratos</th><th>Admin do Tenant</th><th>Staff Pacta</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Abrir Solicitação de contrato</strong></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+            <tr><td><strong>Escolher modelo na Solicitação</strong></td><td>✅ (modelos liberados a ele)</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+            <tr><td><strong>Anexar minuta de terceiro / proposta</strong></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+            <tr><td><strong>Acompanhar status das próprias Solicitações</strong></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+            <tr><td>Ver contratos aos quais tem acesso</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+            <tr><td>Ler e postar no chat interno do contrato</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+            <tr><td>Ler e postar no chat da própria Solicitação</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+            <tr><td>Ver fila de triagem de Solicitações</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+            <tr><td>Analisar Solicitação: vincular modelo e converter em contrato</td><td>—</td><td>—</td><td>✅</td><td>—</td><td>✅</td><td>—</td></tr>
+            <tr><td>Acionar Extrator, Revisor e Redator na análise</td><td>—</td><td>—</td><td>✅</td><td>—</td><td>✅</td><td>—</td></tr>
+            <tr><td>Recusar Solicitação pedindo mais informação</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+            <tr><td>Criar contrato direto (sem Solicitação)</td><td>—</td><td>—</td><td>✅</td><td>—</td><td>✅</td><td>—</td></tr>
+            <tr><td>Aprovar/rejeitar contrato</td><td>—</td><td>✅</td><td>✅</td><td>—</td><td>✅</td><td>—</td></tr>
+            <tr><td>Decidir sobre ajuste da contraparte (negociação)</td><td>—</td><td>—</td><td>✅</td><td>—</td><td>✅</td><td>—</td></tr>
+            <tr><td>Criar aditivo</td><td>—</td><td>—</td><td>✅</td><td>—</td><td>✅</td><td>—</td></tr>
+            <tr><td>Criar/editar categoria e modelo de contrato</td><td>—</td><td>—</td><td>✅</td><td>—</td><td>✅</td><td>—</td></tr>
+            <tr><td>Configurar alçadas e SLA</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>—</td></tr>
+            <tr><td>Ver painel de prazos e SLA de todos os contratos</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>—</td></tr>
+            <tr><td>Designar responsável e cobrar etapa atrasada</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>—</td></tr>
+            <tr><td>Gerar relatório de performance de SLA</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>—</td></tr>
+            <tr><td>Acionar agentes de IA</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+            <tr><td>Convidar/remover usuário</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>—</td></tr>
+            <tr><td>Gerenciar plano e faturamento</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>—</td></tr>
+            <tr><td>Ver painel cross-tenant de saúde/uso</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td></tr>
+            <tr><td>Acessar dados de um tenant (break-glass)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅ (auditado, expira em 4h)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout info">
+        <p><strong>Nota sobre licenciamento:</strong> como o <code>visualizador</code> é o papel mais numeroso e cobramos por assento, vale decidir com o time comercial se ele consome um assento cheio. A recomendação é <strong>sim</strong> — é um usuário que gera trabalho no sistema, e um "assento gratuito de solicitante" cria o incentivo errado (empresa cadastra 200 solicitantes e 3 pagos). Alternativa, se virar objeção de venda: assento de solicitante com preço reduzido, definido em tabela separada.</p>
+      </div>
+
+      <h2>Eventos de Notificação</h2>
+      <div class="callout">
+        <p><strong>Regra geral:</strong> nenhum evento gera e-mail próprio. Todos entram como item no <strong>digest diário</strong> do destinatário, agrupados por severidade. O in-app continua imediato — o sino da interface reflete o estado real na hora, é o e-mail que é consolidado.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Evento</th><th>Notificado</th><th>Severidade no digest</th></tr></thead>
+          <tbody>
+            <tr><td>Nova Solicitação aguardando triagem</td><td>Jurídico + Gestor de Contratos</td><td><span class="badge badge-red">crítico</span> se passou de 24h úteis · <span class="badge badge-yellow">atenção</span> antes disso</td></tr>
+            <tr><td>Solicitação convertida em contrato</td><td>Solicitante</td><td><span class="badge badge-gray">informativo</span></td></tr>
+            <tr><td>Solicitação recusada / mais informação pedida</td><td>Solicitante</td><td><span class="badge badge-yellow">atenção</span> — depende dele para andar</td></tr>
+            <tr><td>Marco contratual se aproximando (cada antecedência configurada)</td><td><code>notify_user_ids</code> do marco</td><td><span class="badge badge-yellow">atenção</span> · <span class="badge badge-red">crítico</span> a partir de D-7</td></tr>
+            <tr><td>Prazo entrando na fila de tratamento</td><td>Responsável designado + Gestor de Contratos</td><td><span class="badge badge-yellow">atenção</span></td></tr>
+            <tr><td>Cobrança periódica de prazo em aberto</td><td>Responsável designado</td><td><span class="badge badge-yellow">atenção</span></td></tr>
+            <tr><td>Prazo interno escalado sem ação</td><td>Gestor de Contratos + Jurídico</td><td><span class="badge badge-red">crítico</span></td></tr>
+            <tr><td>Contrato aguardando aprovação explícita</td><td>Aprovador da alçada</td><td><span class="badge badge-red">crítico</span> — trava o negócio</td></tr>
+            <tr><td>Contraparte comentou ou anexou ajuste na negociação</td><td>Jurídico responsável pelo contrato</td><td><span class="badge badge-red">crítico</span> — contraparte esperando</td></tr>
+            <tr><td>Certidão de compliance vencendo</td><td><code>notify_user_ids</code> do documento</td><td><span class="badge badge-yellow">atenção</span></td></tr>
+            <tr><td>SLA de etapa em risco (75% consumido)</td><td>Responsável da etapa + Gestor de Contratos</td><td><span class="badge badge-yellow">atenção</span></td></tr>
+            <tr><td>Limite de assentos do plano atingido</td><td>Admin do tenant</td><td><span class="badge badge-gray">informativo</span> + banner in-app</td></tr>
+            <tr><td>Falha de conectividade com o provedor de assinatura</td><td>Admin do tenant + staff Pacta</td><td><span class="badge badge-red">crítico</span></td></tr>
+            <tr><td>Acesso break-glass da equipe Pacta iniciado</td><td>Admin do tenant</td><td><span class="badge badge-blue">imediato</span> — exceção: transparência exige aviso na hora</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Anatomia do Digest</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Elemento</th><th>Regra</th></tr></thead>
+          <tbody>
+            <tr><td>Assunto</td><td>Reflete o que é acionável: "3 prazos exigem sua atenção hoje" · sem itens críticos, "Resumo diário de contratos — 5 atualizações"</td></tr>
+            <tr><td>Ordem das seções</td><td>Crítico → Atenção → Informativo. O usuário nunca precisa rolar para achar o que é urgente</td></tr>
+            <tr><td>Cada linha</td><td>Título curto + contrato + data-limite + link direto (<code>deep_link</code>) para agir em um clique</td></tr>
+            <tr><td>Escopo por pessoa</td><td>Só o que é responsabilidade daquele destinatário — o Gestor de Contratos recebe a visão ampla, o responsável designado recebe só os prazos dele</td></tr>
+            <tr><td>Horário</td><td><code>digest_send_time</code> por tenant (padrão 08:00 BRT), com opção de pular fins de semana</td></tr>
+            <tr><td>Digest vazio</td><td>Não é enviado</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout warn">
+        <p><strong>Ponto que vale decidir com o time:</strong> aprovação pendente e ajuste da contraparte também caem no digest pela regra geral — mas os dois <em>travam</em> algo que está acontecendo agora (um negócio esperando aprovação, uma contraparte aguardando resposta). Esperar até 24h nesses dois casos tem custo direto. O campo <code>immediate_event_types</code> existe justamente para isso: nasce vazio (tudo no digest, como pedido) e o admin do tenant pode promover eventos específicos a envio imediato se a operação mostrar que o digest atrasa demais. A recomendação é começar com tudo no digest e só abrir exceção com evidência de atraso real.</p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ ROADMAP -->
+    <section id="roadmap" class="section">
+      <div class="page-label">Roadmap</div>
+      <h1>Fases &amp; Backlog</h1>
+      <p class="lead">A generalização e a multi-tenancy vêm antes de qualquer feature nova — sem isso não há produto vendável, só o produto interno com um nome diferente.</p>
+
+      <h2>Fase 1 — Fundação Comercial (0–3 meses)</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Item</th><th>Módulo</th><th>Prioridade</th></tr></thead>
+          <tbody>
+            <tr><td>Schema-per-tenant + middleware de resolução de <code>search_path</code></td><td>Multi-tenancy</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td>Serviço de provisionamento automático de tenant</td><td>Multi-tenancy</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td><code>contract_categories</code> configurável substituindo o ENUM fixo</td><td>Generalização</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td><code>contract_requests</code> + <code>request_attachments</code> + tela de Nova Solicitação</td><td>Solicitação</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td>Fila de triagem + conversão em Contract + recusa com motivo</td><td>Solicitação</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td>Tela de Análise da Solicitação com Extrator, Revisor e Redator acionáveis</td><td>Solicitação · IA</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td><code>contract_messages</code> + chat interno em Solicitação e Contrato, com herança na conversão</td><td>Chat</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td>Eventos de sistema na linha do tempo do chat + menções (@) no digest</td><td>Chat</td><td><span class="badge badge-orange">P1</span></td></tr>
+            <tr><td>Permissões do papel <code>visualizador</code> (solicitante) no RBAC</td><td>Acesso</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td>3 pacotes de setor com categorias/templates de exemplo</td><td>Onboarding</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td>Reescrita dos prompts dos 6 agentes de IA (remover vocabulário imobiliário)</td><td>IA</td><td><span class="badge badge-orange">P1</span></td></tr>
+            <tr><td>Integração de billing (Stripe Brasil/Asaas) com cobrança recorrente por plano e validação de <code>seat_limit</code></td><td>Billing</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td><code>tenant_integrations</code> — credenciais de assinatura por tenant, cifradas</td><td>Assinatura</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td>Migração dos agentes de IA para OpenAI GPT-4.1 (structured outputs)</td><td>IA</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td>Troca do canal WhatsApp para Evolution API 2.3.7 auto-hospedada</td><td>Notificações</td><td><span class="badge badge-orange">P1</span></td></tr>
+            <tr><td>Campos de data de alerta em <code>contract_milestones</code> + job de varredura gerando <code>notification_items</code></td><td>Prazos</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td>Digest diário: agrupamento por destinatário, template de e-mail, dedup e <code>skip_if_empty</code></td><td>Notificações</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td>Bloco de aditivos em <code>contracts</code> + propagação de vigência/valor ao contrato pai</td><td>Aditivos</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td>Console interno de implantação (staff Pacta): criação de tenant, pacote de setor, convite de time</td><td>Implantação</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td>Painel cross-tenant de saúde/uso para o time Pacta</td><td>Plataforma</td><td><span class="badge badge-orange">P1</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Fase 2 — Validação com Clientes Piloto (3–6 meses)</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Item</th><th>Módulo</th><th>Prioridade</th></tr></thead>
+          <tbody>
+            <tr><td>3 tenants piloto pagantes em setores distintos (não imobiliário)</td><td>Comercial</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td>Pentest de isolamento multi-tenant</td><td>Segurança</td><td><span class="badge badge-red">P0</span></td></tr>
+            <tr><td>SSO Google/Microsoft Workspace (Enterprise)</td><td>Auth</td><td><span class="badge badge-orange">P1</span></td></tr>
+            <tr><td>Migração assistida de contratos legados (Agente Extrator)</td><td>Onboarding</td><td><span class="badge badge-orange">P1</span></td></tr>
+            <tr><td>Central de contrapartes + documentos de compliance</td><td>Diferencial</td><td><span class="badge badge-orange">P1</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Fase 3 — Expansão (6+ meses)</h2>
+      <div class="tag-list">
+        <span class="tag">DocuSign como segundo SignatureProvider</span>
+        <span class="tag">Internacionalização (i18n, multi-moeda)</span>
+        <span class="tag">Marketplace de templates por setor</span>
+        <span class="tag">Integrações com ERPs (TOTVS, SAP, Sienge)</span>
+        <span class="tag">App mobile nativo para assinatura e aprovação</span>
+        <span class="tag">Programa de white-label/revenda</span>
+      </div>
+
+      <h2>Riscos</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Risco</th><th>Mitigação</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Concorrência com o próprio ClickSign</strong> — o Pacta integra o ClickSign para assinatura, mas o ClickSign vem expandindo funcionalidades de CLM que competem diretamente com o Pacta</td><td>Atenuado pelo modelo de credenciais do próprio tenant: a relação comercial de assinatura é do cliente com o provedor, não da Pacta — não há dependência de contrato de revenda nem margem em risco. Diferenciação pelos agentes de IA (não é o foco do ClickSign hoje) e pela generalização de categorias; a abstração <code>SignatureProvider</code> permite adicionar um segundo provedor sem retrabalho</td></tr>
+            <tr><td>Evolution API auto-hospedada é sessão não oficial de WhatsApp — risco de bloqueio de número ou quebra em atualização do WhatsApp</td><td>WhatsApp entra como canal secundário, nunca único: o digest diário por e-mail (Resend) é o canal de referência. Falha de entrega fica registrada em <code>notification_digests</code> para reprocessamento, e a migração para a API oficial do WhatsApp Business fica mapeada como plano B</td></tr>
+            <tr><td>Digest diário atrasa a reação a um evento que trava o negócio (aprovação pendente, contraparte aguardando)</td><td><code>immediate_event_types</code> permite promover eventos específicos a envio imediato por tenant, sem alterar a regra geral; o in-app segue em tempo real e a métrica de tempo de aprovação sinaliza se o atraso está virando gargalo real</td></tr>
+            <tr><td>Generalização incompleta — resíduo de vocabulário/lógica imobiliária vazando para outros setores</td><td>Critério de go-live exige teste com 3 tenants piloto de setores diferentes antes do GA público</td></tr>
+            <tr><td>Custo operacional de schema-per-tenant em escala (centenas de tenants)</td><td>Monitorar tempo de migration e connection pooling desde os primeiros 20 tenants; plano de migração para modelo híbrido se necessário</td></tr>
+            <tr><td>Ciclo de vendas consultivo alonga o tempo até ativação de MRR, e implantação assistida não escala linearmente com o time comercial/CS</td><td>Métrica de ativação (&gt;80% em 30 dias após o fechamento) como sinal de alerta precoce; pacotes de setor prontos reduzem o esforço de implantação por tenant à medida que o número de clientes cresce</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout success">
+        <p><strong>Próximo passo:</strong> validar a Fase 1 com 3 clientes de design partner fora do setor imobiliário antes de comprometer o investimento completo de generalização — confirmar que a dor (contratos espalhados, prazos perdidos) e a disposição a pagar existem fora do contexto de origem do produto.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<button class="print-btn" onclick="window.print()">⬇ Exportar PDF</button>
+
+<script>
+  function show(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.sidenav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.currentTarget.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>

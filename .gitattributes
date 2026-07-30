@@ -1,0 +1,20 @@
+# Desenvolvimento é no Windows, deploy é em Debian. Sem normalização, arquivo com CRLF
+# quebra na VPS — script de shell não executa e unit do systemd não carrega.
+
+* text=auto eol=lf
+
+# Binários — nunca normalizar
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.docx binary
+*.woff binary
+*.woff2 binary
+
+# Arquivos que precisam de CRLF para funcionar no Windows
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
