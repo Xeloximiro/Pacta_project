@@ -11,14 +11,9 @@ Sessão 1: fundação do repositório, multi-tenancy (schema-per-tenant) e o pri
 
 ### 🔵 Em andamento
 
-- [x] **Etapa A — Repositório e control files** — `.gitignore`, PRDs em `docs/`, control files, push inicial
+- [ ] **Etapa C — Multi-tenancy** — código pode ser escrito; verificação depende da connection string
 
 ### ⚪ A fazer (sessão 1)
-
-**Etapa B — Esqueleto do backend**
-- [ ] venv Python 3.12 + `requirements.txt` + `/health` no ar
-- [ ] `app/core/config.py` (Pydantic Settings) + `.env.example`
-- [ ] Modelos do schema `public`: `tenants`, `plans`, `subscriptions`, `platform_users`, `tenant_memberships`, `tenant_integrations`
 
 **Etapa C — Multi-tenancy (P0, trava todo o resto)**
 - [ ] Alembic em duas linhagens: `alembic/platform` e `alembic/tenant`
@@ -38,7 +33,13 @@ Sessão 1: fundação do repositório, multi-tenancy (schema-per-tenant) e o pri
 ### ✅ Concluído (recente)
 
 - [x] Leitura integral do PRD canônico (`docs/pacta-clm-prd-specs.html`) — 2026-07-29
-- [x] Repositório inicializado e publicado em `Xeloximiro/Pacta_project` — 2026-07-29
+- [x] **Etapa A** — repositório inicializado e publicado em `Xeloximiro/Pacta_project` — 2026-07-29
+- [x] **Etapa B** — esqueleto do backend — 2026-07-29
+  - venv Python 3.12 + `requirements.txt` com versões fixadas e verificadas
+  - `app/core/config.py` + `.env.example` — recusa subir sem `DATABASE_URL` e `SECRET_KEY`
+  - `app/core/db.py` — engine async, sessão, `Base`, mixins e o helper `pg_enum`
+  - `/health` respondendo 200 e `/api/docs` renderizando
+  - 6 modelos do schema `public` com DDL PostgreSQL validado
 
 ### 🔴 Bloqueado
 
